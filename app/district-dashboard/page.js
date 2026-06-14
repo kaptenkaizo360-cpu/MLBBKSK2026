@@ -4,6 +4,8 @@ import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
 import { Trash2, Save, UserPlus, CheckCircle2, RotateCcw, Lock, Pencil } from "lucide-react";
 
+const MAX_PLAYERS = 6;
+
 export default function DistrictDashboard() {
   const { session, ready } = useGuard(["district"]);
   const { store, commit } = useStore();
@@ -27,6 +29,10 @@ export default function DistrictDashboard() {
   }
   function addPlayer(teamId) {
     const t = store.teams.find((x) => x.teamId === teamId);
+    if ((t.players || []).length >= MAX_PLAYERS) {
+      window.alert(`Maksimum ${MAX_PLAYERS} peserta sahaja dibenarkan bagi setiap pasukan.`);
+      return;
+    }
     const players = [...(t.players || []), {
       playerId: `P${Date.now()}`,
       fullName: "", ign: "", mlId: "",
@@ -110,13 +116,18 @@ export default function DistrictDashboard() {
           </div>
 
           <div className="flex items-center justify-between mt-8 mb-3">
-            <h3 className="font-display gold-text">Senarai Peserta</h3>
-            {!locked && (
+            <h3 className="font-display gold-text">
+              Senarai Peserta <span className="text-white/50 text-sm font-normal">({(active.players || []).length}/{MAX_PLAYERS})</span>
+            </h3>
+            {!locked && (active.players || []).length < MAX_PLAYERS && (
               <button onClick={() => addPlayer(active.teamId)} className="btn btn-emerald text-sm">
                 <UserPlus size={16} /> Tambah Peserta
               </button>
             )}
           </div>
+          {!locked && (active.players || []).length >= MAX_PLAYERS && (
+            <p className="text-gold/80 text-xs mb-3">Maksimum {MAX_PLAYERS} peserta telah dicapai.</p>
+          )}
 
           <div className="space-y-3">
             {(active.players || []).map((p) => (
