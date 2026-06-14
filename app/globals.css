@@ -191,3 +191,13 @@ input::placeholder { color: rgba(255,255,255,.4); }
   }
   .print-block { page-break-inside: avoid; margin-bottom: 16px; }
 }
+
+/* Kad perlawanan sedang LIVE — glow merah berdenyut */
+.live-glow { animation: liveGlow 2s ease-in-out infinite; }
+@keyframes liveGlow {
+  0%,100% { box-shadow: 0 0 10px rgba(239,68,68,0.25); }
+  50%     { box-shadow: 0 0 22px rgba(239,68,68,0.55); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .live-glow { animation: none; }
+}

@@ -14,6 +14,7 @@ export default function Home() {
   const registered = teams.filter((t) => t.registered);
   const players = registered.reduce((a, t) => a + (t.players?.length || 0), 0);
 
+  const live = matches.filter((m) => m.status === "live");
   const recent = matches.filter((m) => m.status === "completed").slice(-5).reverse();
 
   return (
@@ -57,6 +58,40 @@ export default function Home() {
         <StatsCard icon={Users} label="Jumlah Peserta" value={players} />
         <StatsCard icon={Swords} label="Perlawanan Selesai" value={matches.filter((m) => m.status === "completed").length} />
       </section>
+
+      {/* SEDANG LIVE */}
+      {live.length > 0 && (
+        <section className="mb-12">
+          <h3 className="font-display text-lg mb-4 flex items-center gap-2 text-red-300">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+            SEDANG LIVE
+          </h3>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {live.map((m) => (
+              <div key={m.matchId} className="glass p-5 border border-red-400/40 live-glow">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-400/40 font-semibold flex items-center gap-1">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                    </span>
+                    LIVE
+                  </span>
+                  <span className="text-white/40 text-xs">{m.category} · Kump. {m.group}</span>
+                </div>
+                <div className="flex items-center justify-between text-base font-semibold">
+                  <span>{m.teamA}</span>
+                  <span className="text-gold text-sm px-3">VS</span>
+                  <span>{m.teamB}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* RECENT RESULTS */}
       <section className="mb-12">

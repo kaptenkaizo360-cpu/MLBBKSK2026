@@ -11,6 +11,7 @@ export default function AdminDashboard() {
   const { ready } = useGuard(["admin"]);
   const { store, commit, refresh } = useStore();
   const [tab, setTab] = useState("teams");
+  const [printDistrict, setPrintDistrict] = useState("ALL"); // ALL = semua daerah
   const [syncState, setSyncState] = useState("idle");
 
   useEffect(() => {
@@ -167,17 +168,27 @@ export default function AdminDashboard() {
             <p className="text-white/55 text-sm">
               Peserta disusun ikut daerah & kategori. Admin boleh edit terus.
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 items-center">
+              <select className="field max-w-[200px] text-sm" value={printDistrict}
+                onChange={(e) => setPrintDistrict(e.target.value)}>
+                <option className="bg-ink" value="ALL">Semua Daerah</option>
+                {DISTRICTS.map((d) => (
+                  <option key={d.name} className="bg-ink" value={d.name}>{d.name}</option>
+                ))}
+              </select>
               <button onClick={saveNow} className="btn btn-emerald text-sm"><Save size={16} /> Simpan</button>
-              <button onClick={printPlayers} className="btn btn-gold text-sm"><Printer size={16} /> Print PDF</button>
+              <button onClick={printPlayers} className="btn btn-gold text-sm">
+                <Printer size={16} /> Print {printDistrict === "ALL" ? "Semua" : printDistrict}
+              </button>
             </div>
           </div>
 
           <div className="print-title">
             Senarai Peserta — Pertandingan MLBB Pendidikan Khas Negeri Johor 2026
+            {printDistrict !== "ALL" && <div style={{ fontSize: "13px", fontWeight: "normal" }}>Daerah {printDistrict}</div>}
           </div>
 
-          {DISTRICTS.map((d) => {
+          {DISTRICTS.filter((d) => printDistrict === "ALL" || d.name === printDistrict).map((d) => {
             const dTeams = store.teams.filter((t) => t.district === d.name);
             return (
               <div key={d.name} className="glass p-4 mb-5 print-block">
