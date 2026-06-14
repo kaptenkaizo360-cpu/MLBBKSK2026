@@ -178,39 +178,41 @@ export default function AdminDashboard() {
           </div>
 
           {DISTRICTS.map((d) => {
-            const dTeams = store.teams.filter((t) => t.district === d.name && (t.players || []).length > 0);
-            if (dTeams.length === 0) return null;
+            const dTeams = store.teams.filter((t) => t.district === d.name);
             return (
               <div key={d.name} className="glass p-4 mb-5 print-block">
                 <h3 className="font-display gold-text text-lg mb-3">{d.name}</h3>
                 {CATEGORIES.map((cat) => {
                   const teamsInCat = dTeams.filter((t) => t.category === cat);
                   const players = teamsInCat.flatMap((t) => (t.players || []).map((p) => ({ ...p, teamId: t.teamId })));
-                  if (players.length === 0) return null;
                   return (
                     <div key={cat} className="mb-4">
                       <div className="text-gold/80 text-sm mb-2">{cat}</div>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead><tr className="text-gold/70 text-left">
-                            {["Bil", "Nama Penuh", "IGN", "ID"].map((h) =>
-                              <th key={h} className="px-3 py-2 whitespace-nowrap">{h}</th>)}
-                          </tr></thead>
-                          <tbody>
-                            {players.map((p, i) => (
-                              <tr key={p.playerId} className="border-t border-white/5">
-                                <td className="px-3 py-2 text-white/60">{i + 1}</td>
-                                <td className="px-2 py-1"><input className="field !py-1 text-sm print-plain" value={p.fullName || ""}
-                                  onChange={(e) => editPlayer(p.teamId, p.playerId, { fullName: e.target.value })} /></td>
-                                <td className="px-2 py-1"><input className="field !py-1 text-sm print-plain" value={p.ign || ""}
-                                  onChange={(e) => editPlayer(p.teamId, p.playerId, { ign: e.target.value })} /></td>
-                                <td className="px-2 py-1"><input className="field !py-1 text-sm print-plain" value={p.mlId || ""}
-                                  onChange={(e) => editPlayer(p.teamId, p.playerId, { mlId: e.target.value })} /></td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                      {players.length === 0 ? (
+                        <p className="text-white/40 text-sm pl-1">Belum ada peserta.</p>
+                      ) : (
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead><tr className="text-gold/70 text-left">
+                              {["Bil", "Nama Penuh", "IGN", "ID"].map((h) =>
+                                <th key={h} className="px-3 py-2 whitespace-nowrap">{h}</th>)}
+                            </tr></thead>
+                            <tbody>
+                              {players.map((p, i) => (
+                                <tr key={p.playerId} className="border-t border-white/5">
+                                  <td className="px-3 py-2 text-white/60">{i + 1}</td>
+                                  <td className="px-2 py-1"><input className="field !py-1 text-sm print-plain" value={p.fullName || ""}
+                                    onChange={(e) => editPlayer(p.teamId, p.playerId, { fullName: e.target.value })} /></td>
+                                  <td className="px-2 py-1"><input className="field !py-1 text-sm print-plain" value={p.ign || ""}
+                                    onChange={(e) => editPlayer(p.teamId, p.playerId, { ign: e.target.value })} /></td>
+                                  <td className="px-2 py-1"><input className="field !py-1 text-sm print-plain" value={p.mlId || ""}
+                                    onChange={(e) => editPlayer(p.teamId, p.playerId, { mlId: e.target.value })} /></td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
