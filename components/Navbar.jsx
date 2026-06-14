@@ -40,7 +40,7 @@ export default function Navbar() {
       {/* Semua di sebelah kiri */}
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
         {/* Logo e-sports = pautan ke Home (kekal login) */}
-        <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2 group shrink-0">
+        <a href="/" onClick={() => setOpen(false)} className="flex items-center gap-2 group shrink-0">
           <img
             src="/logo-esports.jpeg"
             alt="E-Sports MLBB Pendidikan Khas Negeri Johor — Home"
@@ -50,13 +50,13 @@ export default function Navbar() {
           <span className="title-rgb font-display font-bold tracking-wide text-sm sm:text-base whitespace-nowrap">
             MLBB PK JOHOR
           </span>
-        </Link>
+        </a>
 
         {/* Pautan + butang di kiri */}
         <nav className="hidden md:flex items-center gap-5 ml-2">
-          <Link href="/" className="text-white/80 hover:text-gold transition flex items-center gap-1">
+          <a href="/" className="text-white/80 hover:text-gold transition flex items-center gap-1">
             <Home size={15} /> Utama
-          </Link>
+          </a>
           {links.map((l) => (
             <Link key={l.href} href={l.href} className="text-white/80 hover:text-gold transition">
               {l.label}
@@ -81,9 +81,9 @@ export default function Navbar() {
 
       {open && (
         <div className="md:hidden px-4 pb-4 flex flex-col gap-3 items-start">
-          <Link href="/" onClick={() => setOpen(false)} className="text-white/80 hover:text-gold flex items-center gap-1">
+          <a href="/" onClick={() => setOpen(false)} className="text-white/80 hover:text-gold flex items-center gap-1">
             <Home size={15} /> Utama
-          </Link>
+          </a>
           {links.map((l) => (
             <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
               className="text-white/80 hover:text-gold">{l.label}</Link>
