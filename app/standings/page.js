@@ -2,7 +2,7 @@
 import { useStore } from "@/components/useStore";
 import BackToDashboard from "@/components/BackToDashboard";
 import { StandingTable } from "@/components/Tables";
-import { computeStandings } from "@/lib/store";
+import { computeStandings, activeGroups } from "@/lib/store";
 import { CATEGORIES } from "@/data/districts";
 import { Trophy } from "lucide-react";
 
@@ -20,7 +20,7 @@ export default function Standings() {
         <div key={cat} className="mb-10">
           <h2 className="font-display text-xl mb-4">{cat}</h2>
           <div className="grid lg:grid-cols-2 gap-6">
-            {["A", "B"].map((g) => (
+            {activeGroups(store, cat).map((g) => (
               <div key={g}>
                 <div className="text-gold/80 mb-2 text-sm">Kumpulan {g}</div>
                 <StandingTable rows={computeStandings(store, cat, g)} />

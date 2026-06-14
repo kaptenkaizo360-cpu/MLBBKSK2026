@@ -22,12 +22,14 @@ export const CATEGORIES = ["Sekolah Rendah", "Sekolah Menengah"];
 // Pembahagian kumpulan ikut kategori
 export const GROUPING = {
   "Sekolah Rendah": {
-    A: ["Johor Bahru", "Pasir Gudang", "Kulai", "Kota Tinggi", "Mersing", "Pontian"],
-    B: ["Kluang", "Batu Pahat", "Muar", "Tangkak", "Segamat"],
+    A: ["Johor Bahru", "Pasir Gudang", "Kulai", "Kota Tinggi"],
+    B: ["Mersing", "Pontian", "Kluang", "Batu Pahat"],
+    C: ["Muar", "Tangkak", "Segamat"],
   },
   "Sekolah Menengah": {
-    A: ["Kulai", "Kota Tinggi", "Mersing", "Kluang", "Tangkak", "Segamat"],
-    B: ["Batu Pahat", "Muar", "Pontian", "Johor Bahru", "Pasir Gudang"],
+    A: ["Kulai", "Kota Tinggi", "Mersing", "Kluang"],
+    B: ["Tangkak", "Segamat", "Batu Pahat", "Muar"],
+    C: ["Pontian", "Johor Bahru", "Pasir Gudang"],
   },
 };
 
@@ -37,5 +39,6 @@ export function groupOf(district, category) {
   if (!g) return "A";
   if (g.A.includes(district)) return "A";
   if (g.B.includes(district)) return "B";
+  if (g.C.includes(district)) return "C";
   return "A";
 }

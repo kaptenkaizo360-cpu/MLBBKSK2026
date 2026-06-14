@@ -42,7 +42,7 @@ export function StandingTable({ rows }) {
         </thead>
         <tbody>
           {rows.map((r) => {
-            const qualify = r.ranking <= 2;
+            const qualify = r.ranking === 1;
             return (
               <tr
                 key={r.teamId}

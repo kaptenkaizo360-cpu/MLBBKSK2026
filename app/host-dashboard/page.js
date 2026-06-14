@@ -4,7 +4,8 @@ import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
 import { StatusBadge } from "@/components/Tables";
 import { CATEGORIES } from "@/data/districts";
-import { Swords, RefreshCcw, Users } from "lucide-react";
+import { Swords, RefreshCcw, Users, Trophy } from "lucide-react";
+import KnockoutEditor from "@/components/KnockoutEditor";
 
 export default function HostDashboard() {
   const { session, ready } = useGuard(["host"]);
@@ -38,9 +39,12 @@ export default function HostDashboard() {
       </h1>
       <p className="text-white/60 mb-6">Pilih pemenang — standing auto-update (Menang = 3 mata).</p>
 
-      <div className="flex gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-6">
         <button onClick={() => setTab("results")} className={`btn text-sm ${tab === "results" ? "btn-gold" : "btn-ghost"}`}>
           <Swords size={16} /> Keputusan
+        </button>
+        <button onClick={() => setTab("knockout")} className={`btn text-sm ${tab === "knockout" ? "btn-gold" : "btn-ghost"}`}>
+          <Trophy size={16} /> Separuh Akhir & Final
         </button>
         <button onClick={() => setTab("players")} className={`btn text-sm ${tab === "players" ? "btn-gold" : "btn-ghost"}`}>
           <Users size={16} /> Senarai Peserta
@@ -83,6 +87,15 @@ export default function HostDashboard() {
               </div>
             ))}
           </div>
+        </>
+      )}
+
+      {tab === "knockout" && (
+        <>
+          <p className="text-white/55 text-sm mb-4">
+            Isi keputusan separuh akhir, final, dan tempat ke-3/ke-4. Kedudukan akhir dikemaskini automatik.
+          </p>
+          <KnockoutEditor store={store} commit={commit} allowFifthOverride={false} />
         </>
       )}
 

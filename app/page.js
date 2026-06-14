@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
-import { Trophy, Swords, Shield, Users, Gamepad2, Building2, GraduationCap, GitBranch, Crown } from "lucide-react";
+import { Trophy, Swords, Shield, Users, Gamepad2, Building2, GraduationCap, GitBranch, Crown, Lock } from "lucide-react";
 import { useStore } from "@/components/useStore";
 import { StatsCard, StandingTable } from "@/components/Tables";
-import { computeStandings, semifinalPairs, finalStandings, leagueComplete } from "@/lib/store";
+import { computeStandings, semifinalPairs, finalStandings, leagueComplete, registrationComplete, activeGroups } from "@/lib/store";
 import { CATEGORIES } from "@/data/districts";
 
 export default function Home() {
@@ -115,30 +115,49 @@ export default function Home() {
         </div>
       </section>
 
-      {/* STANDINGS — sentiasa dipaparkan */}
+      {/* STANDINGS — hanya selepas semua daerah daftar & disahkan admin */}
       {store && CATEGORIES.map((cat) => {
+        const regDone = registrationComplete(store, cat);
         const done = leagueComplete(store, cat);
+        const total = store.teams.filter((t) => t.category === cat).length;
+        const reg = store.teams.filter((t) => t.category === cat && t.registered).length;
         return (
           <section key={cat} className="mb-12">
             <h3 className="font-display text-xl mb-4 flex items-center gap-2">
               <Trophy size={18} className="text-gold" /> Kedudukan Liga {cat}
             </h3>
-            <div className="grid lg:grid-cols-2 gap-6">
-              {["A", "B"].map((g) => (
-                <div key={g}>
-                  <div className="text-gold/80 mb-2 text-sm">Kumpulan {g}</div>
-                  <StandingTable rows={computeStandings(store, cat, g)} />
-                </div>
-              ))}
-            </div>
 
-            {/* Fasa kalah mati keluar HANYA selepas liga kategori ini tamat */}
-            {done ? (
-              <KnockoutBlock store={store} cat={cat} />
+            {!regDone ? (
+              <div className="glass p-6 flex items-center gap-3 text-white/70">
+                <Lock size={18} className="text-gold" />
+                <div>
+                  <div className="font-semibold">Liga belum bermula.</div>
+                  <div className="text-white/50 text-sm">
+                    Kedudukan akan dipaparkan setelah semua daerah selesai mendaftar dan disahkan oleh admin.
+                    ({reg}/{total} pasukan disahkan)
+                  </div>
+                </div>
+              </div>
             ) : (
-              <p className="text-white/40 text-sm mt-4 flex items-center gap-2">
-                <GitBranch size={15} /> Carta separuh akhir & kedudukan akhir akan dipaparkan setelah semua perlawanan liga {cat} selesai.
-              </p>
+              <>
+                <div className="grid lg:grid-cols-2 gap-6">
+                  {activeGroups(store, cat).map((g) => (
+                    <div key={g}>
+                      <div className="text-gold/80 mb-2 text-sm">Kumpulan {g}</div>
+                      <StandingTable rows={computeStandings(store, cat, g)} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Fasa kalah mati keluar HANYA selepas liga kategori ini tamat */}
+                {done ? (
+                  <KnockoutBlock store={store} cat={cat} />
+                ) : (
+                  <p className="text-white/40 text-sm mt-4 flex items-center gap-2">
+                    <GitBranch size={15} /> Carta separuh akhir & kedudukan akhir akan dipaparkan setelah semua perlawanan liga {cat} selesai.
+                  </p>
+                )}
+              </>
             )}
           </section>
         );

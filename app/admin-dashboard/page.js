@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
-import { resetStore, semifinalPairs, setKnockout, leagueComplete, setTeamGroup } from "@/lib/store";
+import { resetStore, semifinalPairs, setKnockout, leagueComplete, setTeamGroup, removeTeamFromLeague, deleteGroup, activeGroups } from "@/lib/store";
 import { syncNow, getSyncStatus, syncEnabled } from "@/lib/sync";
 import { DISTRICTS, CATEGORIES } from "@/data/districts";
 import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy, Cloud, CloudOff, RefreshCw, ArrowLeftRight, Printer, Save } from "lucide-react";
@@ -86,6 +86,14 @@ export default function AdminDashboard() {
 
   function moveTeam(teamId, newGroup) {
     commit(setTeamGroup(store, teamId, newGroup));
+  }
+  function removeTeam(teamId, teamName) {
+    if (!window.confirm(`Buang pasukan ${teamName} dari liga? Jadual akan dijana semula.`)) return;
+    commit(removeTeamFromLeague(store, teamId));
+  }
+  function delGroup(cat, grp) {
+    if (!window.confirm(`Padam keseluruhan Kumpulan ${grp} (${cat})? Semua pasukan dalam kumpulan ini akan dikeluarkan dari liga.`)) return;
+    commit(deleteGroup(store, cat, grp));
   }
 
   return (
@@ -240,33 +248,51 @@ export default function AdminDashboard() {
       {tab === "groups" && (
         <div className="space-y-8">
           <p className="text-white/55 text-sm">
-            Pindahkan pasukan antara Kumpulan A dan B. Sekolah Rendah hanya boleh dalam liga Rendah,
-            Sekolah Menengah dalam liga Menengah. Jadual perlawanan akan dijana semula automatik selepas perubahan.
+            Susun pasukan ke Kumpulan A, B atau C (kategori sama sahaja). Buang pasukan yang tidak mendaftar,
+            atau padam kumpulan yang tidak lengkap — liga boleh jadi 2 atau 3 kumpulan. Jadual dijana semula automatik.
           </p>
           {CATEGORIES.map((cat) => (
             <div key={cat}>
               <h3 className="font-display gold-text text-lg mb-3">{cat}</h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                {["A", "B"].map((grp) => {
-                  const grpTeams = store.teams.filter((t) => t.category === cat && t.group === grp);
+              <div className="grid md:grid-cols-3 gap-4">
+                {["A", "B", "C"].map((grp) => {
+                  const grpTeams = store.teams.filter((t) => t.category === cat && t.group === grp && !t.excluded);
+                  if (grpTeams.length === 0) return (
+                    <div key={grp} className="glass p-4 opacity-60">
+                      <div className="text-gold/80 text-sm mb-2">Kumpulan {grp}</div>
+                      <p className="text-white/40 text-sm">Tiada pasukan / telah dipadam.</p>
+                    </div>
+                  );
                   return (
                     <div key={grp} className="glass p-4">
                       <div className="text-gold/80 text-sm mb-3 flex items-center justify-between">
                         <span>Kumpulan {grp}</span>
-                        <span className="text-white/40 text-xs">{grpTeams.length} pasukan</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-white/40 text-xs">{grpTeams.length} pasukan</span>
+                          <button onClick={() => delGroup(cat, grp)} className="text-red-300 hover:text-red-200" title="Padam kumpulan">
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
                       </div>
                       <div className="space-y-2">
                         {grpTeams.map((t) => (
-                          <div key={t.teamId} className="flex items-center justify-between bg-black/20 rounded-lg px-3 py-2">
+                          <div key={t.teamId} className="flex items-center justify-between gap-2 bg-black/20 rounded-lg px-3 py-2">
                             <span className="text-sm">{t.teamName} <span className="text-white/40">· {t.district}</span></span>
-                            <button
-                              onClick={() => moveTeam(t.teamId, grp === "A" ? "B" : "A")}
-                              className="btn btn-ghost !py-1 !px-3 text-xs">
-                              <ArrowLeftRight size={13} /> Ke {grp === "A" ? "B" : "A"}
-                            </button>
+                            <div className="flex items-center gap-1">
+                              <select
+                                value={grp}
+                                onChange={(e) => moveTeam(t.teamId, e.target.value)}
+                                className="field !py-1 !px-2 text-xs max-w-[60px]">
+                                {["A", "B", "C"].map((g) => (
+                                  <option key={g} value={g} className="bg-ink">{g}</option>
+                                ))}
+                              </select>
+                              <button onClick={() => removeTeam(t.teamId, t.teamName)} className="text-red-300 hover:text-red-200" title="Buang pasukan">
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
                           </div>
                         ))}
-                        {grpTeams.length === 0 && <p className="text-white/40 text-sm">Tiada pasukan.</p>}
                       </div>
                     </div>
                   );

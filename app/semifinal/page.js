@@ -44,8 +44,8 @@ export default function Semifinal() {
                   const { sf1, sf2 } = semifinalPairs(store, cat);
                   return (
                     <div className="grid md:grid-cols-2 gap-6">
-                      <Match title="Separuh Akhir 1 — Johan A vs Naib Johan B" home={sf1.home} away={sf1.away} />
-                      <Match title="Separuh Akhir 2 — Johan B vs Naib Johan A" home={sf2.home} away={sf2.away} />
+                      <Match title="Separuh Akhir 1 — Johan Terbaik vs Naib Johan Terbaik" home={sf1.home} away={sf1.away} />
+                      <Match title="Separuh Akhir 2 — Johan vs Johan" home={sf2.home} away={sf2.away} />
                     </div>
                   );
                 })()}
