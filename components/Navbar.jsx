@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut, Home } from "lucide-react";
 import { getSession, clearSession } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
@@ -10,7 +10,12 @@ export default function Navbar() {
   const [session, setSessionState] = useState(null);
   const router = useRouter();
 
-  useEffect(() => { setSessionState(getSession()); }, []);
+  useEffect(() => {
+    setSessionState(getSession());
+    const onUpdate = () => setSessionState(getSession());
+    window.addEventListener("mlbb-session", onUpdate);
+    return () => window.removeEventListener("mlbb-session", onUpdate);
+  }, []);
 
   const links = [
     { href: "/standings", label: "Kedudukan" },
@@ -19,23 +24,15 @@ export default function Navbar() {
     { href: "/final", label: "Final" },
   ];
 
-  // Klik logo = ke Home + auto logout (dengan peringatan jika sedang login)
+  // Klik logo / Home = ke Laman Utama, KEKAL login (tidak logout)
   function goHome() {
-    if (session) {
-      const ok = window.confirm(
-        "Pastikan data anda telah disimpan sebelum keluar.\n\nKlik OK untuk ke Laman Utama dan log keluar."
-      );
-      if (!ok) return;
-    }
-    clearSession();
-    setSessionState(null);
     setOpen(false);
     router.push("/");
   }
 
   function logout() {
     const ok = window.confirm(
-      "PERINGATAN: Pastikan data anda telah disimpan!\n\nAdakah anda pasti mahu log keluar?"
+      "Pastikan semua maklumat telah disemak dan disimpan untuk mengelakkan kesalahan.\n\nAdakah anda pasti mahu log keluar?"
     );
     if (!ok) return;
     clearSession();
@@ -48,7 +45,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 glass !rounded-none border-x-0 border-t-0">
       {/* Semua di sebelah kiri */}
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
-        {/* Logo e-sports sebagai butang Home (klik = ke home + logout) */}
+        {/* Logo e-sports = butang Home (kekal login) */}
         <button onClick={goHome} className="flex items-center gap-2 group shrink-0">
           <img
             src="/logo-esports.jpeg"
@@ -61,8 +58,11 @@ export default function Navbar() {
           </span>
         </button>
 
-        {/* Pautan di kiri (selepas logo) */}
+        {/* Pautan + butang di kiri */}
         <nav className="hidden md:flex items-center gap-5 ml-2">
+          <button onClick={goHome} className="text-white/80 hover:text-gold transition flex items-center gap-1">
+            <Home size={15} /> Utama
+          </button>
           {links.map((l) => (
             <Link key={l.href} href={l.href} className="text-white/80 hover:text-gold transition">
               {l.label}
@@ -72,8 +72,6 @@ export default function Navbar() {
             <div className="flex items-center gap-3">
               <span className="text-gold/80 text-sm hidden lg:inline">{session.label}</span>
               <button onClick={logout} className="btn btn-gold text-sm">
-                <img src="/logo-esports.jpeg" alt="" className="h-5 w-5 rounded-full object-cover"
-                  onError={(e) => { e.currentTarget.style.display = "none"; }} />
                 <LogOut size={16} /> Log Keluar
               </button>
             </div>
@@ -82,7 +80,6 @@ export default function Navbar() {
           )}
         </nav>
 
-        {/* Butang menu mobile (kekal kanan) */}
         <button className="md:hidden text-gold ml-auto" onClick={() => setOpen(!open)}>
           {open ? <X /> : <Menu />}
         </button>
@@ -90,6 +87,9 @@ export default function Navbar() {
 
       {open && (
         <div className="md:hidden px-4 pb-4 flex flex-col gap-3 items-start">
+          <button onClick={goHome} className="text-white/80 hover:text-gold flex items-center gap-1">
+            <Home size={15} /> Utama
+          </button>
           {links.map((l) => (
             <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
               className="text-white/80 hover:text-gold">{l.label}</Link>
@@ -98,8 +98,6 @@ export default function Navbar() {
             <>
               <span className="text-gold/80 text-sm">{session.label}</span>
               <button onClick={logout} className="btn btn-gold text-sm w-fit">
-                <img src="/logo-esports.jpeg" alt="" className="h-5 w-5 rounded-full object-cover"
-                  onError={(e) => { e.currentTarget.style.display = "none"; }} />
                 <LogOut size={16} /> Log Keluar
               </button>
             </>

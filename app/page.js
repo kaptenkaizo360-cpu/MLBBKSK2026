@@ -19,9 +19,9 @@ export default function Home() {
   return (
     <div className="max-w-7xl mx-auto px-4">
       {/* HERO */}
-      <section className="text-center py-16 sm:py-24">
+      <section className="text-left py-16 sm:py-24">
         {/* Logo Johor Leads & E-Sports bersebelahan */}
-        <div className="flex items-center justify-center gap-5 sm:gap-8 mb-8 flex-wrap">
+        <div className="flex items-center justify-start gap-5 sm:gap-8 mb-8 flex-wrap">
           <img src="/logo.png" alt="Johor Leads"
             className="h-16 sm:h-24 w-auto object-contain drop-shadow-[0_0_18px_rgba(212,175,55,0.45)]"
             onError={(e) => { e.currentTarget.style.display = "none"; }} />
@@ -37,11 +37,11 @@ export default function Home() {
           PERTANDINGAN <span className="title-rgb">MOBILE LEGEND</span><br />
           PENDIDIKAN KHAS NEGERI JOHOR
         </h1>
-        <p className="text-white/70 mt-5 max-w-2xl mx-auto">
+        <p className="text-white/70 mt-5 max-w-2xl">
           Sempena Karnival Kokurikulum, Sukan dan Permainan Pendidikan Khas
         </p>
 
-        <div className="flex flex-wrap justify-center gap-3 mt-8">
+        <div className="flex flex-wrap justify-start gap-3 mt-8">
           <Link href="/login" className="btn btn-gold"><Shield size={18} /> Login Daerah</Link>
           <Link href="/login" className="btn btn-emerald"><Gamepad2 size={18} /> Login Host</Link>
           <Link href="/login" className="btn btn-emerald"><Trophy size={18} /> Login Admin</Link>

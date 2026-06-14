@@ -23,8 +23,19 @@ export default function AdminDashboard() {
   if (!ready || !store) return <div className="text-center py-20 text-white/60">Memuatkan…</div>;
 
   const allPlayers = store.teams.flatMap((t) =>
-    (t.players || []).map((p) => ({ ...p, team: t.teamName, district: t.district, category: t.category }))
+    (t.players || []).map((p) => ({ ...p, teamId: t.teamId, team: t.teamName, district: t.district, category: t.category }))
   );
+
+  function editPlayer(teamId, playerId, patch) {
+    commit({
+      ...store,
+      teams: store.teams.map((t) =>
+        t.teamId === teamId
+          ? { ...t, players: (t.players || []).map((p) => p.playerId === playerId ? { ...p, ...patch } : p) }
+          : t
+      ),
+    });
+  }
 
   function exportCSV() {
     const rows = [["Daerah", "Kategori", "Nama Sekolah", "Nama Penuh", "No Kad OKU", "Username Profile", "IGN"]];
@@ -104,28 +115,38 @@ export default function AdminDashboard() {
       )}
 
       {tab === "players" && (
-        <div className="overflow-x-auto glass p-1">
-          <table className="w-full text-sm">
-            <thead><tr className="text-gold/80 text-left">
-              {["Daerah", "Kategori", "Nama Sekolah", "Nama Penuh", "No Kad OKU", "Username Profile", "IGN"].map((h) =>
-                <th key={h} className="px-3 py-2 whitespace-nowrap">{h}</th>)}
-            </tr></thead>
-            <tbody>
-              {allPlayers.map((p) => (
-                <tr key={p.playerId} className="row-hover border-t border-white/5">
-                  <td className="px-3 py-2">{p.district}</td>
-                  <td className="px-3 py-2">{p.category}</td>
-                  <td className="px-3 py-2">{p.school}</td>
-                  <td className="px-3 py-2">{p.fullName}</td>
-                  <td className="px-3 py-2">{p.okuCard}</td>
-                  <td className="px-3 py-2">{p.usernameMLBB}</td>
-                  <td className="px-3 py-2 gold-text">{p.ign}</td>
-                </tr>
-              ))}
-              {allPlayers.length === 0 && <tr><td colSpan={7} className="px-3 py-6 text-center text-white/50">Tiada peserta berdaftar.</td></tr>}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <p className="text-white/55 text-sm mb-3">
+            Admin boleh edit terus mana-mana maklumat peserta di bawah. Perubahan disimpan automatik.
+          </p>
+          <div className="overflow-x-auto glass p-1">
+            <table className="w-full text-sm">
+              <thead><tr className="text-gold/80 text-left">
+                {["Daerah", "Kategori", "Nama Sekolah", "Nama Penuh", "No Kad OKU", "Username Profile", "IGN"].map((h) =>
+                  <th key={h} className="px-3 py-2 whitespace-nowrap">{h}</th>)}
+              </tr></thead>
+              <tbody>
+                {allPlayers.map((p) => (
+                  <tr key={p.playerId} className="row-hover border-t border-white/5">
+                    <td className="px-3 py-2 whitespace-nowrap">{p.district}</td>
+                    <td className="px-3 py-2 whitespace-nowrap">{p.category}</td>
+                    <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.school || ""}
+                      onChange={(e) => editPlayer(p.teamId, p.playerId, { school: e.target.value })} /></td>
+                    <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.fullName || ""}
+                      onChange={(e) => editPlayer(p.teamId, p.playerId, { fullName: e.target.value })} /></td>
+                    <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.okuCard || ""}
+                      onChange={(e) => editPlayer(p.teamId, p.playerId, { okuCard: e.target.value })} /></td>
+                    <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.usernameMLBB || ""}
+                      onChange={(e) => editPlayer(p.teamId, p.playerId, { usernameMLBB: e.target.value })} /></td>
+                    <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.ign || ""}
+                      onChange={(e) => editPlayer(p.teamId, p.playerId, { ign: e.target.value })} /></td>
+                  </tr>
+                ))}
+                {allPlayers.length === 0 && <tr><td colSpan={7} className="px-3 py-6 text-center text-white/50">Tiada peserta berdaftar.</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {tab === "knockout" && (
