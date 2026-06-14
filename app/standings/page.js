@@ -2,9 +2,9 @@
 import { useStore } from "@/components/useStore";
 import BackToDashboard from "@/components/BackToDashboard";
 import { StandingTable } from "@/components/Tables";
-import { computeStandings, activeGroups } from "@/lib/store";
+import { computeStandings, activeGroups, registrationComplete } from "@/lib/store";
 import { CATEGORIES } from "@/data/districts";
-import { Trophy } from "lucide-react";
+import { Trophy, Lock } from "lucide-react";
 
 export default function Standings() {
   const { store } = useStore();
@@ -16,19 +16,37 @@ export default function Standings() {
         <Trophy /> Kedudukan Liga
       </h1>
       <BackToDashboard />
-      {CATEGORIES.map((cat) => (
-        <div key={cat} className="mb-10">
-          <h2 className="font-display text-xl mb-4">{cat}</h2>
-          <div className="grid lg:grid-cols-2 gap-6">
-            {activeGroups(store, cat).map((g) => (
-              <div key={g}>
-                <div className="text-gold/80 mb-2 text-sm">Kumpulan {g}</div>
-                <StandingTable rows={computeStandings(store, cat, g)} />
+      {CATEGORIES.map((cat) => {
+        const regDone = registrationComplete(store, cat);
+        const total = store.teams.filter((t) => t.category === cat && !t.excluded).length;
+        const reg = store.teams.filter((t) => t.category === cat && !t.excluded && t.registered).length;
+        return (
+          <div key={cat} className="mb-10">
+            <h2 className="font-display text-xl mb-4">{cat}</h2>
+            {!regDone ? (
+              <div className="glass p-6 flex items-center gap-3 text-white/70">
+                <Lock size={18} className="text-gold" />
+                <div>
+                  <div className="font-semibold">Liga belum bermula.</div>
+                  <div className="text-white/50 text-sm">
+                    Kedudukan akan dipaparkan setelah semua daerah selesai mendaftar dan disahkan oleh admin.
+                    ({reg}/{total} pasukan disahkan)
+                  </div>
+                </div>
               </div>
-            ))}
+            ) : (
+              <div className="grid lg:grid-cols-2 gap-6">
+                {activeGroups(store, cat).map((g) => (
+                  <div key={g}>
+                    <div className="text-gold/80 mb-2 text-sm">Kumpulan {g}</div>
+                    <StandingTable rows={computeStandings(store, cat, g)} />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        );
+      })}
       <p className="text-white/50 text-xs">
         Susunan: Mata → Menang. Jika seri, admin tentukan secara manual. Dua teratas setiap kumpulan layak separuh akhir.
       </p>
