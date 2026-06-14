@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useStore } from "@/components/useStore";
+import BackToDashboard from "@/components/BackToDashboard";
 import { ResultTable } from "@/components/Tables";
 import { CATEGORIES } from "@/data/districts";
 import { Swords } from "lucide-react";
@@ -18,6 +19,7 @@ export default function Results() {
       <h1 className="font-display gold-text text-2xl font-bold flex items-center gap-2 mb-6">
         <Swords /> Keputusan Perlawanan
       </h1>
+      <BackToDashboard />
       <div className="flex flex-wrap gap-3 mb-6">
         <select className="field max-w-xs" value={cat} onChange={(e) => setCat(e.target.value)}>
           {CATEGORIES.map((c) => <option key={c} className="bg-ink">{c}</option>)}

@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useStore } from "@/components/useStore";
+import BackToDashboard from "@/components/BackToDashboard";
 import { finalStandings, semifinalPairs, leagueComplete } from "@/lib/store";
 import { FinalStandingTable } from "@/components/Tables";
 import { CATEGORIES } from "@/data/districts";
@@ -80,6 +81,7 @@ export default function Final() {
       <h1 className="font-display gold-text text-2xl font-bold flex items-center gap-2 mb-8 justify-center">
         <Trophy /> Final & Kedudukan Akhir
       </h1>
+      <BackToDashboard />
 
       {CATEGORIES.map((cat) => {
         const done = leagueComplete(store, cat);

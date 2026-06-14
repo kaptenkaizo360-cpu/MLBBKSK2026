@@ -1,14 +1,11 @@
 "use client";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Menu, X, LogOut, Home } from "lucide-react";
+import { Menu, X, LogOut, Home, LayoutDashboard } from "lucide-react";
 import { getSession, clearSession } from "@/lib/auth";
-import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [session, setSessionState] = useState(null);
-  const router = useRouter();
 
   useEffect(() => {
     setSessionState(getSession());
@@ -24,6 +21,12 @@ export default function Navbar() {
     { href: "/final", label: "Final" },
   ];
 
+  // Dashboard ikut role yang login
+  const dashboardHref =
+    session?.role === "admin" ? "/admin-dashboard" :
+    session?.role === "host" ? "/host-dashboard" :
+    session?.role === "district" ? "/district-dashboard" : null;
+
   function logout() {
     const ok = window.confirm(
       "Pastikan semua maklumat telah disemak dan disimpan untuk mengelakkan kesalahan.\n\nAdakah anda pasti mahu log keluar?"
@@ -32,7 +35,7 @@ export default function Navbar() {
     clearSession();
     setSessionState(null);
     setOpen(false);
-    router.push("/");
+    window.location.href = "/";
   }
 
   return (
@@ -40,7 +43,7 @@ export default function Navbar() {
       {/* Semua di sebelah kiri */}
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
         {/* Logo e-sports = pautan ke Home (kekal login) */}
-        <a href="/" onClick={() => setOpen(false)} className="flex items-center gap-2 group shrink-0">
+        <a href="/" className="flex items-center gap-2 group shrink-0">
           <img
             src="/logo-esports.jpeg"
             alt="E-Sports MLBB Pendidikan Khas Negeri Johor — Home"
@@ -58,10 +61,15 @@ export default function Navbar() {
             <Home size={15} /> Utama
           </a>
           {links.map((l) => (
-            <Link key={l.href} href={l.href} className="text-white/80 hover:text-gold transition">
+            <a key={l.href} href={l.href} className="text-white/80 hover:text-gold transition">
               {l.label}
-            </Link>
+            </a>
           ))}
+          {dashboardHref && (
+            <a href={dashboardHref} className="text-gold hover:text-mustard transition flex items-center gap-1">
+              <LayoutDashboard size={15} /> Dashboard
+            </a>
+          )}
           {session ? (
             <div className="flex items-center gap-3">
               <span className="text-gold/80 text-sm hidden lg:inline">{session.label}</span>
@@ -70,7 +78,7 @@ export default function Navbar() {
               </button>
             </div>
           ) : (
-            <Link href="/login" className="btn btn-gold text-sm">Login</Link>
+            <a href="/login" className="btn btn-gold text-sm">Login</a>
           )}
         </nav>
 
@@ -81,13 +89,17 @@ export default function Navbar() {
 
       {open && (
         <div className="md:hidden px-4 pb-4 flex flex-col gap-3 items-start">
-          <a href="/" onClick={() => setOpen(false)} className="text-white/80 hover:text-gold flex items-center gap-1">
+          <a href="/" className="text-white/80 hover:text-gold flex items-center gap-1">
             <Home size={15} /> Utama
           </a>
           {links.map((l) => (
-            <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
-              className="text-white/80 hover:text-gold">{l.label}</Link>
+            <a key={l.href} href={l.href} className="text-white/80 hover:text-gold">{l.label}</a>
           ))}
+          {dashboardHref && (
+            <a href={dashboardHref} className="text-gold hover:text-mustard flex items-center gap-1">
+              <LayoutDashboard size={15} /> Dashboard
+            </a>
+          )}
           {session ? (
             <>
               <span className="text-gold/80 text-sm">{session.label}</span>
@@ -96,7 +108,7 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            <Link href="/login" onClick={() => setOpen(false)} className="btn btn-gold text-sm w-fit">Login</Link>
+            <a href="/login" className="btn btn-gold text-sm w-fit">Login</a>
           )}
         </div>
       )}

@@ -1,5 +1,6 @@
 "use client";
 import { useStore } from "@/components/useStore";
+import BackToDashboard from "@/components/BackToDashboard";
 import { StandingTable } from "@/components/Tables";
 import { computeStandings } from "@/lib/store";
 import { CATEGORIES } from "@/data/districts";
@@ -14,6 +15,7 @@ export default function Standings() {
       <h1 className="font-display gold-text text-2xl font-bold flex items-center gap-2 mb-8">
         <Trophy /> Kedudukan Liga
       </h1>
+      <BackToDashboard />
       {CATEGORIES.map((cat) => (
         <div key={cat} className="mb-10">
           <h2 className="font-display text-xl mb-4">{cat}</h2>

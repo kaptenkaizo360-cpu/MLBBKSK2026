@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useStore } from "@/components/useStore";
+import BackToDashboard from "@/components/BackToDashboard";
 import { semifinalPairs, leagueComplete } from "@/lib/store";
 import { CATEGORIES } from "@/data/districts";
 import { GitBranch, Lock } from "lucide-react";
@@ -31,6 +32,7 @@ export default function Semifinal() {
       <h1 className="font-display gold-text text-2xl font-bold flex items-center gap-2 mb-8">
         <GitBranch /> Separuh Akhir
       </h1>
+      <BackToDashboard />
       {CATEGORIES.map((cat) => {
         const done = leagueComplete(store, cat);
         return (
