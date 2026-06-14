@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
-import { resetStore, semifinalPairs, setKnockout } from "@/lib/store";
+import { resetStore, semifinalPairs, setKnockout, leagueComplete } from "@/lib/store";
 import { DISTRICTS, CATEGORIES } from "@/data/districts";
 import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy } from "lucide-react";
 
@@ -119,6 +119,17 @@ export default function AdminDashboard() {
       {tab === "knockout" && (
         <div className="grid lg:grid-cols-2 gap-6">
           {CATEGORIES.map((cat) => {
+            const done = leagueComplete(store, cat);
+            if (!done) {
+              return (
+                <div key={cat} className="glass p-5">
+                  <h3 className="font-display gold-text mb-2">{cat}</h3>
+                  <p className="text-white/55 text-sm">
+                    Keputusan kalah mati boleh diisi setelah semua perlawanan liga {cat} selesai.
+                  </p>
+                </div>
+              );
+            }
             const { sf1, sf2 } = semifinalPairs(store, cat);
             const ko = (store.knockout && store.knockout[cat]) || {};
             const finalists = [ko.sf1Winner, ko.sf2Winner].filter(Boolean);

@@ -1,8 +1,9 @@
 "use client";
+import Link from "next/link";
 import { useStore } from "@/components/useStore";
-import { semifinalPairs } from "@/lib/store";
+import { semifinalPairs, leagueComplete } from "@/lib/store";
 import { CATEGORIES } from "@/data/districts";
-import { GitBranch } from "lucide-react";
+import { GitBranch, Lock } from "lucide-react";
 
 function Match({ title, home, away }) {
   return (
@@ -31,18 +32,32 @@ export default function Semifinal() {
         <GitBranch /> Separuh Akhir
       </h1>
       {CATEGORIES.map((cat) => {
-        const { sf1, sf2 } = semifinalPairs(store, cat);
+        const done = leagueComplete(store, cat);
         return (
           <div key={cat} className="mb-10">
             <h2 className="font-display text-xl mb-4">{cat}</h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <Match title="Separuh Akhir 1 — Johan A vs Naib Johan B" home={sf1.home} away={sf1.away} />
-              <Match title="Separuh Akhir 2 — Johan B vs Naib Johan A" home={sf2.home} away={sf2.away} />
-            </div>
+            {done ? (
+              <>
+                {(() => {
+                  const { sf1, sf2 } = semifinalPairs(store, cat);
+                  return (
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <Match title="Separuh Akhir 1 — Johan A vs Naib Johan B" home={sf1.home} away={sf1.away} />
+                      <Match title="Separuh Akhir 2 — Johan B vs Naib Johan A" home={sf2.home} away={sf2.away} />
+                    </div>
+                  );
+                })()}
+              </>
+            ) : (
+              <div className="glass p-6 flex items-center gap-3 text-white/60">
+                <Lock size={18} className="text-gold" />
+                <span>Carta separuh akhir dipaparkan setelah semua perlawanan liga {cat} selesai.</span>
+                <Link href="/standings" className="btn btn-ghost text-sm ml-auto">Lihat Kedudukan</Link>
+              </div>
+            )}
           </div>
         );
       })}
-      <p className="text-white/50 text-xs">Pasangan dijana automatik daripada kedudukan liga semasa.</p>
     </div>
   );
 }

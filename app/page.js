@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
-import { Trophy, Swords, Shield, Users, Gamepad2, Building2, GraduationCap, GitBranch } from "lucide-react";
+import { Trophy, Swords, Shield, Users, Gamepad2, Building2, GraduationCap, GitBranch, Crown } from "lucide-react";
 import { useStore } from "@/components/useStore";
 import { StatsCard, StandingTable } from "@/components/Tables";
-import { computeStandings, semifinalPairs, finalStandings } from "@/lib/store";
+import { computeStandings, semifinalPairs, finalStandings, leagueComplete } from "@/lib/store";
 import { CATEGORIES } from "@/data/districts";
 
 export default function Home() {
@@ -70,85 +70,84 @@ export default function Home() {
         </div>
       </section>
 
-      {/* STANDINGS */}
-      {store && CATEGORIES.map((cat) => (
-        <section key={cat} className="mb-12">
-          <h3 className="font-display text-xl mb-4 flex items-center gap-2">
-            <Trophy size={18} className="text-gold" /> Kedudukan Liga {cat}
-          </h3>
-          <div className="grid lg:grid-cols-2 gap-6">
-            {["A", "B"].map((g) => (
-              <div key={g}>
-                <div className="text-gold/80 mb-2 text-sm">Kumpulan {g}</div>
-                <StandingTable rows={computeStandings(store, cat, g)} />
-              </div>
-            ))}
-          </div>
-        </section>
-      ))}
-
-      {/* SEMIFINAL */}
-      {store && (
-        <section className="mb-12">
-          <h3 className="font-display text-xl mb-4 flex items-center gap-2">
-            <GitBranch size={18} className="text-gold" /> Separuh Akhir
-          </h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            {CATEGORIES.map((cat) => {
-              const { sf1, sf2 } = semifinalPairs(store, cat);
-              return (
-                <div key={cat} className="glass p-5">
-                  <div className="text-gold/80 text-sm mb-3">{cat}</div>
-                  <SF title="SA 1" home={sf1.home} away={sf1.away} />
-                  <SF title="SA 2" home={sf2.home} away={sf2.away} />
+      {/* STANDINGS — sentiasa dipaparkan */}
+      {store && CATEGORIES.map((cat) => {
+        const done = leagueComplete(store, cat);
+        return (
+          <section key={cat} className="mb-12">
+            <h3 className="font-display text-xl mb-4 flex items-center gap-2">
+              <Trophy size={18} className="text-gold" /> Kedudukan Liga {cat}
+            </h3>
+            <div className="grid lg:grid-cols-2 gap-6">
+              {["A", "B"].map((g) => (
+                <div key={g}>
+                  <div className="text-gold/80 mb-2 text-sm">Kumpulan {g}</div>
+                  <StandingTable rows={computeStandings(store, cat, g)} />
                 </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
+              ))}
+            </div>
 
-      {/* FINAL & KEDUDUKAN AKHIR */}
-      {store && (
-        <section className="mb-16">
-          <h3 className="font-display text-xl mb-4 flex items-center gap-2">
-            <Trophy size={18} className="text-gold" /> Kedudukan Akhir
-          </h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            {CATEGORIES.map((cat) => {
-              const fs = finalStandings(store, cat);
-              const rows = [
-                { lab: "Johan", t: fs.champion },
-                { lab: "Naib Johan", t: fs.runnerUp },
-                { lab: "Ketiga", t: fs.third },
-                { lab: "Keempat", t: fs.fourth },
-                { lab: "Kelima", t: fs.fifth },
-              ];
-              return (
-                <div key={cat} className="glass p-5">
-                  <div className="text-gold/80 text-sm mb-3">{cat}</div>
-                  {rows.map((r) => (
-                    <div key={r.lab} className="flex items-center justify-between text-sm border-b border-white/5 py-1.5">
-                      <span className="gold-text font-semibold">{r.lab}</span>
-                      <span>{r.t?.teamName || "-"}</span>
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
+            {/* Fasa kalah mati keluar HANYA selepas liga kategori ini tamat */}
+            {done ? (
+              <KnockoutBlock store={store} cat={cat} />
+            ) : (
+              <p className="text-white/40 text-sm mt-4 flex items-center gap-2">
+                <GitBranch size={15} /> Carta separuh akhir & kedudukan akhir akan dipaparkan setelah semua perlawanan liga {cat} selesai.
+              </p>
+            )}
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
+function KnockoutBlock({ store, cat }) {
+  const { sf1, sf2 } = semifinalPairs(store, cat);
+  const fs = finalStandings(store, cat);
+  const rows = [
+    { lab: "Johan", t: fs.champion },
+    { lab: "Naib Johan", t: fs.runnerUp },
+    { lab: "Ketiga", t: fs.third },
+    { lab: "Keempat", t: fs.fourth },
+    { lab: "Kelima", t: fs.fifth },
+  ];
+
+  return (
+    <div className="mt-8 grid lg:grid-cols-2 gap-6">
+      {/* Separuh akhir + final */}
+      <div className="glass p-5">
+        <div className="text-gold/80 text-sm mb-3 flex items-center gap-2"><GitBranch size={15} /> Separuh Akhir & Final</div>
+        <SF title="Separuh Akhir 1" home={sf1.home} away={sf1.away} />
+        <SF title="Separuh Akhir 2" home={sf2.home} away={sf2.away} />
+        <div className="mt-3 pt-3 border-t border-white/10">
+          <div className="text-white/40 text-xs mb-1 flex items-center gap-1"><Crown size={13} className="text-gold" /> Final</div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-semibold">{fs.finalists.finalist1?.teamName || "TBD"}</span>
+            <span className="text-gold text-xs">vs</span>
+            <span className="font-semibold">{fs.finalists.finalist2?.teamName || "TBD"}</span>
           </div>
-          <div className="text-center mt-6">
-            <Link href="/final" className="btn btn-gold">Lihat Final Penuh</Link>
+        </div>
+      </div>
+
+      {/* Kedudukan akhir 1-5 */}
+      <div className="glass p-5">
+        <div className="text-gold/80 text-sm mb-3 flex items-center gap-2"><Trophy size={15} /> Kedudukan Akhir</div>
+        {rows.map((r) => (
+          <div key={r.lab} className="flex items-center justify-between text-sm border-b border-white/5 py-1.5">
+            <span className="gold-text font-semibold">{r.lab}</span>
+            <span>{r.t?.teamName || "-"}</span>
           </div>
-        </section>
-      )}
+        ))}
+        <Link href="/final" className="btn btn-gold text-sm mt-4">Lihat Final Penuh</Link>
+      </div>
     </div>
   );
 }
 
 function SF({ title, home, away }) {
   return (
-    <div className="mb-3">
+    <div className="mb-2">
       <div className="text-white/40 text-xs mb-1">{title}</div>
       <div className="flex items-center justify-between text-sm">
         <span className="font-semibold">{home?.teamName || "TBD"}</span>
