@@ -161,3 +161,33 @@ input::placeholder { color: rgba(255,255,255,.4); }
 @media (prefers-reduced-motion: reduce) {
   .bg-arena::before, .bg-arena::after, .title-rgb, .animate-moveGrad { animation: none; }
 }
+
+/* ===== Gaya cetakan PDF (senarai peserta) ===== */
+.print-title { display: none; }
+@media print {
+  /* Sorok semua kecuali kawasan cetak */
+  body * { visibility: hidden; }
+  #print-area, #print-area * { visibility: visible; }
+  #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
+
+  header, footer, .no-print, .brand-bg { display: none !important; }
+
+  /* Latar putih, teks hitam untuk jimat dakwat & jelas */
+  html, body { background: #fff !important; color: #000 !important; }
+  .glass { background: #fff !important; border: 1px solid #ccc !important; box-shadow: none !important; backdrop-filter: none !important; }
+  .gold-text, [style*="color: #F2C94C"], [class*="text-gold"] { color: #8a6d00 !important; -webkit-text-fill-color: #8a6d00 !important; }
+  #print-area table { color: #000 !important; border-collapse: collapse; width: 100%; }
+  #print-area th, #print-area td { border: 1px solid #999 !important; padding: 4px 8px !important; }
+
+  /* Tukar input jadi teks biasa (buang kotak input) */
+  .print-plain {
+    border: none !important; background: transparent !important; color: #000 !important;
+    padding: 0 !important; -webkit-text-fill-color: #000 !important;
+  }
+
+  .print-title {
+    display: block !important; visibility: visible !important;
+    text-align: center; font-weight: bold; font-size: 16px; margin-bottom: 14px; color: #000 !important;
+  }
+  .print-block { page-break-inside: avoid; margin-bottom: 16px; }
+}

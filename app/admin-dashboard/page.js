@@ -5,7 +5,7 @@ import { useStore } from "@/components/useStore";
 import { resetStore, semifinalPairs, setKnockout, leagueComplete, setTeamGroup } from "@/lib/store";
 import { syncNow, getSyncStatus, syncEnabled } from "@/lib/sync";
 import { DISTRICTS, CATEGORIES } from "@/data/districts";
-import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy, Cloud, CloudOff, RefreshCw, ArrowLeftRight } from "lucide-react";
+import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy, Cloud, CloudOff, RefreshCw, ArrowLeftRight, Printer, Save } from "lucide-react";
 
 export default function AdminDashboard() {
   const { ready } = useGuard(["admin"]);
@@ -52,6 +52,25 @@ export default function AdminDashboard() {
     commit({ ...store, teams: store.teams.map((t) => t.teamId === teamId
       ? { ...t, registered: false, school: "", managerName: "", phone: "", email: "", players: [] } : t) });
   }
+  // Padam semua data daerah (kedua-dua kategori) — untuk daerah tiada pendaftaran
+  function deleteDistrict(districtName) {
+    const ok = window.confirm(
+      `Padam semua data pendaftaran untuk daerah ${districtName}?\n\nTindakan ini akan mengosongkan pasukan & peserta daerah ini.`
+    );
+    if (!ok) return;
+    commit({
+      ...store,
+      teams: store.teams.map((t) => t.district === districtName
+        ? { ...t, registered: false, school: "", managerName: "", phone: "", email: "", players: [] } : t),
+    });
+  }
+  function saveNow() {
+    if (syncEnabled()) { syncNow(store); window.alert("Data telah disimpan ke Google Sheet."); }
+    else window.alert("Data disimpan dalam pelayar ini. (Aktifkan Google Sheet untuk simpanan berkongsi.)");
+  }
+  function printPlayers() {
+    window.print();
+  }
   function setKO(cat, patch) {
     commit(setKnockout(store, cat, patch));
   }
@@ -88,66 +107,121 @@ export default function AdminDashboard() {
       </div>
 
       {tab === "teams" && (
-        <div className="overflow-x-auto glass p-1">
-          <table className="w-full text-sm">
-            <thead><tr className="text-gold/80 text-left">
-              {["Daerah", "Kategori", "Kump.", "Pasukan", "Sekolah", "Pengurus", "Telefon", "Peserta", "Status", "Tindakan"].map((h) =>
-                <th key={h} className="px-3 py-2 whitespace-nowrap">{h}</th>)}
-            </tr></thead>
-            <tbody>
-              {store.teams.map((t) => (
-                <tr key={t.teamId} className="row-hover border-t border-white/5">
-                  <td className="px-3 py-2">{t.district}</td>
-                  <td className="px-3 py-2">{t.category}</td>
-                  <td className="px-3 py-2">{t.group}</td>
-                  <td className="px-3 py-2">{t.teamName}</td>
-                  <td className="px-3 py-2">{t.school || "-"}</td>
-                  <td className="px-3 py-2">{t.managerName || "-"}</td>
-                  <td className="px-3 py-2">{t.phone || "-"}</td>
-                  <td className="px-3 py-2">{t.players?.length || 0}</td>
-                  <td className="px-3 py-2">{t.registered ? <span className="text-gold">Disahkan</span> : <span className="text-white/40">Belum</span>}</td>
-                  <td className="px-3 py-2 flex gap-2">
-                    <button onClick={() => verify(t.teamId, !t.registered)} className="text-gold text-xs underline">
-                      {t.registered ? "Batal" : "Sahkan"}
-                    </button>
-                    <button onClick={() => deleteTeamData(t.teamId)} className="text-red-300"><Trash2 size={14} /></button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {tab === "players" && (
         <>
-          <p className="text-white/55 text-sm mb-3">
-            Admin boleh edit terus mana-mana maklumat peserta di bawah. Perubahan disimpan automatik.
-          </p>
+          {(() => {
+            const noReg = DISTRICTS.filter((d) =>
+              !store.teams.some((t) => t.district === d.name && t.registered)
+            );
+            if (noReg.length === 0) return null;
+            return (
+              <div className="glass p-4 mb-4">
+                <h3 className="font-display gold-text text-sm mb-3">Daerah Tiada Pendaftaran</h3>
+                <div className="flex flex-wrap gap-2">
+                  {noReg.map((d) => (
+                    <div key={d.name} className="flex items-center gap-2 bg-black/20 rounded-lg px-3 py-1.5">
+                      <span className="text-sm text-white/70">{d.name}</span>
+                      <button onClick={() => deleteDistrict(d.name)} className="text-red-300 hover:text-red-200">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
           <div className="overflow-x-auto glass p-1">
             <table className="w-full text-sm">
               <thead><tr className="text-gold/80 text-left">
-                {["Daerah", "Kategori", "Nama Penuh", "IGN", "ID"].map((h) =>
+                {["Daerah", "Kategori", "Kump.", "Pasukan", "Sekolah", "Pengurus", "Telefon", "Peserta", "Status", "Tindakan"].map((h) =>
                   <th key={h} className="px-3 py-2 whitespace-nowrap">{h}</th>)}
               </tr></thead>
               <tbody>
-                {allPlayers.map((p) => (
-                  <tr key={p.playerId} className="row-hover border-t border-white/5">
-                    <td className="px-3 py-2 whitespace-nowrap">{p.district}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">{p.category}</td>
-                    <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.fullName || ""}
-                      onChange={(e) => editPlayer(p.teamId, p.playerId, { fullName: e.target.value })} /></td>
-                    <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.ign || ""}
-                      onChange={(e) => editPlayer(p.teamId, p.playerId, { ign: e.target.value })} /></td>
-                    <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.mlId || ""}
-                      onChange={(e) => editPlayer(p.teamId, p.playerId, { mlId: e.target.value })} /></td>
+                {store.teams.map((t) => (
+                  <tr key={t.teamId} className="row-hover border-t border-white/5">
+                    <td className="px-3 py-2">{t.district}</td>
+                    <td className="px-3 py-2">{t.category}</td>
+                    <td className="px-3 py-2">{t.group}</td>
+                    <td className="px-3 py-2">{t.teamName}</td>
+                    <td className="px-3 py-2">{t.school || "-"}</td>
+                    <td className="px-3 py-2">{t.managerName || "-"}</td>
+                    <td className="px-3 py-2">{t.phone || "-"}</td>
+                    <td className="px-3 py-2">{t.players?.length || 0}</td>
+                    <td className="px-3 py-2">{t.registered ? <span className="text-gold">Disahkan</span> : <span className="text-white/40">Belum</span>}</td>
+                    <td className="px-3 py-2 flex gap-2">
+                      <button onClick={() => verify(t.teamId, !t.registered)} className="text-gold text-xs underline">
+                        {t.registered ? "Batal" : "Sahkan"}
+                      </button>
+                      <button onClick={() => deleteTeamData(t.teamId)} className="text-red-300"><Trash2 size={14} /></button>
+                    </td>
                   </tr>
                 ))}
-                {allPlayers.length === 0 && <tr><td colSpan={5} className="px-3 py-6 text-center text-white/50">Tiada peserta berdaftar.</td></tr>}
               </tbody>
             </table>
           </div>
         </>
+      )}
+
+      {tab === "players" && (
+        <div id="print-area">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4 no-print">
+            <p className="text-white/55 text-sm">
+              Peserta disusun ikut daerah & kategori. Admin boleh edit terus.
+            </p>
+            <div className="flex gap-2">
+              <button onClick={saveNow} className="btn btn-emerald text-sm"><Save size={16} /> Simpan</button>
+              <button onClick={printPlayers} className="btn btn-gold text-sm"><Printer size={16} /> Print PDF</button>
+            </div>
+          </div>
+
+          <div className="print-title">
+            Senarai Peserta — Pertandingan MLBB Pendidikan Khas Negeri Johor 2026
+          </div>
+
+          {DISTRICTS.map((d) => {
+            const dTeams = store.teams.filter((t) => t.district === d.name && (t.players || []).length > 0);
+            if (dTeams.length === 0) return null;
+            return (
+              <div key={d.name} className="glass p-4 mb-5 print-block">
+                <h3 className="font-display gold-text text-lg mb-3">{d.name}</h3>
+                {CATEGORIES.map((cat) => {
+                  const teamsInCat = dTeams.filter((t) => t.category === cat);
+                  const players = teamsInCat.flatMap((t) => (t.players || []).map((p) => ({ ...p, teamId: t.teamId })));
+                  if (players.length === 0) return null;
+                  return (
+                    <div key={cat} className="mb-4">
+                      <div className="text-gold/80 text-sm mb-2">{cat}</div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead><tr className="text-gold/70 text-left">
+                            {["Bil", "Nama Penuh", "IGN", "ID"].map((h) =>
+                              <th key={h} className="px-3 py-2 whitespace-nowrap">{h}</th>)}
+                          </tr></thead>
+                          <tbody>
+                            {players.map((p, i) => (
+                              <tr key={p.playerId} className="border-t border-white/5">
+                                <td className="px-3 py-2 text-white/60">{i + 1}</td>
+                                <td className="px-2 py-1"><input className="field !py-1 text-sm print-plain" value={p.fullName || ""}
+                                  onChange={(e) => editPlayer(p.teamId, p.playerId, { fullName: e.target.value })} /></td>
+                                <td className="px-2 py-1"><input className="field !py-1 text-sm print-plain" value={p.ign || ""}
+                                  onChange={(e) => editPlayer(p.teamId, p.playerId, { ign: e.target.value })} /></td>
+                                <td className="px-2 py-1"><input className="field !py-1 text-sm print-plain" value={p.mlId || ""}
+                                  onChange={(e) => editPlayer(p.teamId, p.playerId, { mlId: e.target.value })} /></td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+
+          {allPlayers.length === 0 && (
+            <p className="text-white/50 text-sm text-center py-6">Tiada peserta berdaftar lagi.</p>
+          )}
+        </div>
       )}
 
       {tab === "groups" && (
