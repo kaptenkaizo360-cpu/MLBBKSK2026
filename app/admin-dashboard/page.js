@@ -2,10 +2,10 @@
 import { useState, useEffect } from "react";
 import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
-import { resetStore, semifinalPairs, setKnockout, leagueComplete } from "@/lib/store";
+import { resetStore, semifinalPairs, setKnockout, leagueComplete, setTeamGroup } from "@/lib/store";
 import { syncNow, getSyncStatus, syncEnabled } from "@/lib/sync";
 import { DISTRICTS, CATEGORIES } from "@/data/districts";
-import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy, Cloud, CloudOff, RefreshCw } from "lucide-react";
+import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy, Cloud, CloudOff, RefreshCw, ArrowLeftRight } from "lucide-react";
 
 export default function AdminDashboard() {
   const { ready } = useGuard(["admin"]);
@@ -59,9 +59,14 @@ export default function AdminDashboard() {
   const tabs = [
     { id: "teams", label: "Pasukan", icon: ShieldCheck },
     { id: "players", label: "Peserta & IGN", icon: Users },
+    { id: "groups", label: "Kumpulan Liga", icon: ArrowLeftRight },
     { id: "knockout", label: "Kalah Mati", icon: Trophy },
     { id: "data", label: "Data & Tetapan", icon: Database },
   ];
+
+  function moveTeam(teamId, newGroup) {
+    commit(setTeamGroup(store, teamId, newGroup));
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
@@ -143,6 +148,46 @@ export default function AdminDashboard() {
             </table>
           </div>
         </>
+      )}
+
+      {tab === "groups" && (
+        <div className="space-y-8">
+          <p className="text-white/55 text-sm">
+            Pindahkan pasukan antara Kumpulan A dan B. Sekolah Rendah hanya boleh dalam liga Rendah,
+            Sekolah Menengah dalam liga Menengah. Jadual perlawanan akan dijana semula automatik selepas perubahan.
+          </p>
+          {CATEGORIES.map((cat) => (
+            <div key={cat}>
+              <h3 className="font-display gold-text text-lg mb-3">{cat}</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                {["A", "B"].map((grp) => {
+                  const grpTeams = store.teams.filter((t) => t.category === cat && t.group === grp);
+                  return (
+                    <div key={grp} className="glass p-4">
+                      <div className="text-gold/80 text-sm mb-3 flex items-center justify-between">
+                        <span>Kumpulan {grp}</span>
+                        <span className="text-white/40 text-xs">{grpTeams.length} pasukan</span>
+                      </div>
+                      <div className="space-y-2">
+                        {grpTeams.map((t) => (
+                          <div key={t.teamId} className="flex items-center justify-between bg-black/20 rounded-lg px-3 py-2">
+                            <span className="text-sm">{t.teamName} <span className="text-white/40">· {t.district}</span></span>
+                            <button
+                              onClick={() => moveTeam(t.teamId, grp === "A" ? "B" : "A")}
+                              className="btn btn-ghost !py-1 !px-3 text-xs">
+                              <ArrowLeftRight size={13} /> Ke {grp === "A" ? "B" : "A"}
+                            </button>
+                          </div>
+                        ))}
+                        {grpTeams.length === 0 && <p className="text-white/40 text-sm">Tiada pasukan.</p>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       {tab === "knockout" && (
