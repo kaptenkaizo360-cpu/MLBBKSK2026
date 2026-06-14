@@ -20,6 +20,26 @@ export default function Home() {
     <div className="max-w-7xl mx-auto px-4">
       {/* HERO */}
       <section className="text-center py-16 sm:py-24">
+        {/* Tiga logo rasmi sebaris */}
+        <div className="flex items-center justify-center gap-6 sm:gap-10 mb-10 flex-wrap">
+          <img src="/logo-mssj.png" alt="Majlis Sukan Sekolah Johor"
+            className="h-16 sm:h-20 w-auto object-contain"
+            onError={(e) => { e.currentTarget.style.display = "none"; }} />
+          <img src="/logo-kpm.png" alt="Kementerian Pendidikan Malaysia"
+            className="h-16 sm:h-20 w-auto object-contain"
+            onError={(e) => { e.currentTarget.style.display = "none"; }} />
+          <img src="/logo-mlbb.png" alt="Mobile Legends Bang Bang"
+            className="h-12 sm:h-16 w-auto object-contain"
+            onError={(e) => { e.currentTarget.style.display = "none"; }} />
+        </div>
+
+        {/* Logo utama pertandingan */}
+        <img
+          src="/logo.png"
+          alt="Johor Leads"
+          className="mx-auto mb-8 h-36 sm:h-48 lg:h-56 w-auto object-contain drop-shadow-[0_0_22px_rgba(212,175,55,0.5)]"
+          onError={(e) => { e.currentTarget.style.display = "none"; }}
+        />
         <div className="inline-flex items-center gap-2 glass px-4 py-1.5 mb-6 text-gold text-sm">
           <Gamepad2 size={16} /> E-Sport Pendidikan Khas
         </div>
