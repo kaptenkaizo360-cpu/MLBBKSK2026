@@ -152,8 +152,9 @@ main, header, footer { position: relative; z-index: 1; }
 .row-hover:hover { background: rgba(212,175,55,0.08); }
 
 /* Highlight top-2 layak: bar gold kiri + background navy lebih terang */
-.qualify-row > td { background: rgba(19,49,110,0.45); }
+.qualify-row > td { background: rgba(19,49,110,0.35); position: relative; }
 .qualify-row > td:first-child { box-shadow: inset 4px 0 0 0 var(--gold); }
+.qualify-row > td { color: #fff; }
 
 input::placeholder { color: rgba(255,255,255,.4); }
 

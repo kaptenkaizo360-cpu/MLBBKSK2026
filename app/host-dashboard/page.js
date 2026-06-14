@@ -89,12 +89,12 @@ export default function HostDashboard() {
       {tab === "players" && (
         <>
           <p className="text-white/50 text-sm mb-3">
-            Senarai peserta semua daerah. IGN dan Username Profile disembunyikan untuk host.
+            Senarai peserta semua daerah. IGN dan ID disembunyikan untuk host.
           </p>
           <div className="overflow-x-auto glass p-1">
             <table className="w-full text-sm">
               <thead><tr className="text-gold/80 text-left">
-                {["Daerah", "Kategori", "Nama Sekolah", "Nama Penuh", "No Kad OKU"].map((h) =>
+                {["Daerah", "Kategori", "Nama Penuh"].map((h) =>
                   <th key={h} className="px-3 py-2 whitespace-nowrap">{h}</th>)}
               </tr></thead>
               <tbody>
@@ -102,12 +102,10 @@ export default function HostDashboard() {
                   <tr key={p.playerId} className="row-hover border-t border-white/5">
                     <td className="px-3 py-2">{p.district}</td>
                     <td className="px-3 py-2">{p.category}</td>
-                    <td className="px-3 py-2">{p.school}</td>
                     <td className="px-3 py-2">{p.fullName}</td>
-                    <td className="px-3 py-2">{p.okuCard}</td>
                   </tr>
                 ))}
-                {allPlayers.length === 0 && <tr><td colSpan={5} className="px-3 py-6 text-center text-white/50">Tiada peserta berdaftar lagi.</td></tr>}
+                {allPlayers.length === 0 && <tr><td colSpan={3} className="px-3 py-6 text-center text-white/50">Tiada peserta berdaftar lagi.</td></tr>}
               </tbody>
             </table>
           </div>

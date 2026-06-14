@@ -29,7 +29,7 @@ export default function DistrictDashboard() {
     const t = store.teams.find((x) => x.teamId === teamId);
     const players = [...(t.players || []), {
       playerId: `P${Date.now()}`,
-      ign: "", usernameMLBB: "", okuCard: "", fullName: "", school: "",
+      fullName: "", ign: "", mlId: "",
     }];
     updateTeam(teamId, { players });
   }
@@ -120,12 +120,10 @@ export default function DistrictDashboard() {
 
           <div className="space-y-3">
             {(active.players || []).map((p) => (
-              <div key={p.playerId} className="glass p-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                <Field label="IGN" value={p.ign} disabled={locked} onChange={(v) => updatePlayer(active.teamId, p.playerId, { ign: v })} />
-                <Field label="Username Profile MLBB" value={p.usernameMLBB} disabled={locked} onChange={(v) => updatePlayer(active.teamId, p.playerId, { usernameMLBB: v })} />
-                <Field label="No. Kad OKU" value={p.okuCard} disabled={locked} onChange={(v) => updatePlayer(active.teamId, p.playerId, { okuCard: v })} />
+              <div key={p.playerId} className="glass p-4 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <Field label="Nama Penuh" value={p.fullName} disabled={locked} onChange={(v) => updatePlayer(active.teamId, p.playerId, { fullName: v })} />
-                <Field label="Nama Sekolah" value={p.school} disabled={locked} onChange={(v) => updatePlayer(active.teamId, p.playerId, { school: v })} />
+                <Field label="IGN" value={p.ign} disabled={locked} onChange={(v) => updatePlayer(active.teamId, p.playerId, { ign: v })} />
+                <Field label="ID" value={p.mlId} disabled={locked} onChange={(v) => updatePlayer(active.teamId, p.playerId, { mlId: v })} />
                 {!locked && (
                   <div className="flex items-end">
                     <button onClick={() => removePlayer(active.teamId, p.playerId)} className="btn btn-ghost text-sm">

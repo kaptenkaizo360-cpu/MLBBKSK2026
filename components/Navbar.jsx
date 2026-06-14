@@ -24,12 +24,6 @@ export default function Navbar() {
     { href: "/final", label: "Final" },
   ];
 
-  // Klik logo / Home = ke Laman Utama, KEKAL login (tidak logout)
-  function goHome() {
-    setOpen(false);
-    router.push("/");
-  }
-
   function logout() {
     const ok = window.confirm(
       "Pastikan semua maklumat telah disemak dan disimpan untuk mengelakkan kesalahan.\n\nAdakah anda pasti mahu log keluar?"
@@ -45,8 +39,8 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 glass !rounded-none border-x-0 border-t-0">
       {/* Semua di sebelah kiri */}
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
-        {/* Logo e-sports = butang Home (kekal login) */}
-        <button onClick={goHome} className="flex items-center gap-2 group shrink-0">
+        {/* Logo e-sports = pautan ke Home (kekal login) */}
+        <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-2 group shrink-0">
           <img
             src="/logo-esports.jpeg"
             alt="E-Sports MLBB Pendidikan Khas Negeri Johor — Home"
@@ -56,13 +50,13 @@ export default function Navbar() {
           <span className="title-rgb font-display font-bold tracking-wide text-sm sm:text-base whitespace-nowrap">
             MLBB PK JOHOR
           </span>
-        </button>
+        </Link>
 
         {/* Pautan + butang di kiri */}
         <nav className="hidden md:flex items-center gap-5 ml-2">
-          <button onClick={goHome} className="text-white/80 hover:text-gold transition flex items-center gap-1">
+          <Link href="/" className="text-white/80 hover:text-gold transition flex items-center gap-1">
             <Home size={15} /> Utama
-          </button>
+          </Link>
           {links.map((l) => (
             <Link key={l.href} href={l.href} className="text-white/80 hover:text-gold transition">
               {l.label}
@@ -87,9 +81,9 @@ export default function Navbar() {
 
       {open && (
         <div className="md:hidden px-4 pb-4 flex flex-col gap-3 items-start">
-          <button onClick={goHome} className="text-white/80 hover:text-gold flex items-center gap-1">
+          <Link href="/" onClick={() => setOpen(false)} className="text-white/80 hover:text-gold flex items-center gap-1">
             <Home size={15} /> Utama
-          </button>
+          </Link>
           {links.map((l) => (
             <Link key={l.href} href={l.href} onClick={() => setOpen(false)}
               className="text-white/80 hover:text-gold">{l.label}</Link>

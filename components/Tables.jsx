@@ -60,7 +60,7 @@ export function StandingTable({ rows }) {
                 <td className="px-3 py-2">{r.played}</td>
                 <td className="px-3 py-2">{r.win}</td>
                 <td className="px-3 py-2">{r.lose}</td>
-                <td className="px-3 py-2 font-bold gold-text">{r.points}</td>
+                <td className="px-3 py-2 font-bold" style={{ color: "#F2C94C" }}>{r.points}</td>
               </tr>
             );
           })}
@@ -127,7 +127,7 @@ export function FinalStandingTable({ rows }) {
             const r = rows[i];
             return (
               <tr key={lab} className={`border-t border-white/5 ${i < 2 ? "qualify-row" : ""}`}>
-                <td className="px-3 py-2 font-semibold gold-text">{lab}</td>
+                <td className="px-3 py-2 font-semibold" style={{ color: "#F2C94C" }}>{lab}</td>
                 <td className="px-3 py-2">{r?.teamName || "-"}</td>
                 <td className="px-3 py-2 text-white/70">{r?.district || "-"}</td>
                 <td className="px-3 py-2 text-white/70">{r?.category || "-"}</td>

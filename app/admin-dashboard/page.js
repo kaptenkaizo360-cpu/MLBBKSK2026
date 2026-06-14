@@ -38,8 +38,8 @@ export default function AdminDashboard() {
   }
 
   function exportCSV() {
-    const rows = [["Daerah", "Kategori", "Nama Sekolah", "Nama Penuh", "No Kad OKU", "Username Profile", "IGN"]];
-    allPlayers.forEach((p) => rows.push([p.district, p.category, p.school, p.fullName, p.okuCard, p.usernameMLBB, p.ign]));
+    const rows = [["Daerah", "Kategori", "Nama Penuh", "IGN", "ID"]];
+    allPlayers.forEach((p) => rows.push([p.district, p.category, p.fullName, p.ign, p.mlId]));
     const csv = rows.map((r) => r.map((c) => `"${c || ""}"`).join(",")).join("\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
     const a = document.createElement("a");
@@ -122,7 +122,7 @@ export default function AdminDashboard() {
           <div className="overflow-x-auto glass p-1">
             <table className="w-full text-sm">
               <thead><tr className="text-gold/80 text-left">
-                {["Daerah", "Kategori", "Nama Sekolah", "Nama Penuh", "No Kad OKU", "Username Profile", "IGN"].map((h) =>
+                {["Daerah", "Kategori", "Nama Penuh", "IGN", "ID"].map((h) =>
                   <th key={h} className="px-3 py-2 whitespace-nowrap">{h}</th>)}
               </tr></thead>
               <tbody>
@@ -130,19 +130,15 @@ export default function AdminDashboard() {
                   <tr key={p.playerId} className="row-hover border-t border-white/5">
                     <td className="px-3 py-2 whitespace-nowrap">{p.district}</td>
                     <td className="px-3 py-2 whitespace-nowrap">{p.category}</td>
-                    <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.school || ""}
-                      onChange={(e) => editPlayer(p.teamId, p.playerId, { school: e.target.value })} /></td>
                     <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.fullName || ""}
                       onChange={(e) => editPlayer(p.teamId, p.playerId, { fullName: e.target.value })} /></td>
-                    <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.okuCard || ""}
-                      onChange={(e) => editPlayer(p.teamId, p.playerId, { okuCard: e.target.value })} /></td>
-                    <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.usernameMLBB || ""}
-                      onChange={(e) => editPlayer(p.teamId, p.playerId, { usernameMLBB: e.target.value })} /></td>
                     <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.ign || ""}
                       onChange={(e) => editPlayer(p.teamId, p.playerId, { ign: e.target.value })} /></td>
+                    <td className="px-2 py-1"><input className="field !py-1 text-sm" value={p.mlId || ""}
+                      onChange={(e) => editPlayer(p.teamId, p.playerId, { mlId: e.target.value })} /></td>
                   </tr>
                 ))}
-                {allPlayers.length === 0 && <tr><td colSpan={7} className="px-3 py-6 text-center text-white/50">Tiada peserta berdaftar.</td></tr>}
+                {allPlayers.length === 0 && <tr><td colSpan={5} className="px-3 py-6 text-center text-white/50">Tiada peserta berdaftar.</td></tr>}
               </tbody>
             </table>
           </div>

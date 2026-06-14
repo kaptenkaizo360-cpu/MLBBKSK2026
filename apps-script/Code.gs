@@ -87,10 +87,10 @@ function writeReadableTabs(store) {
   }));
 
   var p = sheetFor(ss, "Peserta",
-    ["Daerah","Kategori","Nama Sekolah","Nama Penuh","No Kad OKU","Username Profile","IGN"]);
+    ["Daerah","Kategori","Nama Penuh","IGN","ID"]);
   var prows = [];
   teams.forEach(function(x){ (x.players||[]).forEach(function(pl){
-    prows.push([x.district,x.category,pl.school||"",pl.fullName||"",pl.okuCard||"",pl.usernameMLBB||"",pl.ign||""]);
+    prows.push([x.district,x.category,pl.fullName||"",pl.ign||"",pl.mlId||""]);
   });});
   writeRows(p, prows);
 
