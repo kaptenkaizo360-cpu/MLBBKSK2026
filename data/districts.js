@@ -26,8 +26,8 @@ export const GROUPING = {
     B: ["Kluang", "Batu Pahat", "Muar", "Tangkak", "Segamat"],
   },
   "Sekolah Menengah": {
-    A: ["Johor Bahru", "Pasir Gudang", "Kulai", "Kota Tinggi", "Mersing", "Kluang"],
-    B: ["Batu Pahat", "Muar", "Tangkak", "Segamat", "Pontian"],
+    A: ["Kulai", "Kota Tinggi", "Mersing", "Kluang", "Tangkak", "Segamat"],
+    B: ["Batu Pahat", "Muar", "Pontian", "Johor Bahru", "Pasir Gudang"],
   },
 };
 
