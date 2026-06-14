@@ -2,8 +2,7 @@
 import { useState, useMemo } from "react";
 import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
-import { PLAYER_ROLES } from "@/data/districts";
-import { Plus, Trash2, Save, UserPlus, CheckCircle2 } from "lucide-react";
+import { Trash2, Save, UserPlus, CheckCircle2 } from "lucide-react";
 
 export default function DistrictDashboard() {
   const { session, ready } = useGuard(["district"]);
@@ -26,8 +25,8 @@ export default function DistrictDashboard() {
   function addPlayer(teamId) {
     const t = store.teams.find((x) => x.teamId === teamId);
     const players = [...(t.players || []), {
-      playerId: `P${Date.now()}`, fullName: "", icNumber: "", school: "",
-      usernameMLBB: "", ign: "", role: "Mage", status: "Utama",
+      playerId: `P${Date.now()}`,
+      ign: "", usernameMLBB: "", okuCard: "", fullName: "", school: "",
     }];
     updateTeam(teamId, { players });
   }
@@ -43,7 +42,7 @@ export default function DistrictDashboard() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
       <h1 className="font-display gold-text text-2xl font-bold">Dashboard Daerah {session.district}</h1>
-      <p className="text-white/60 mb-8">Kumpulan {session.group} · Daftar pasukan sekolah rendah & menengah</p>
+      <p className="text-white/60 mb-8">Daftar pasukan sekolah rendah & menengah</p>
 
       <div className="grid md:grid-cols-2 gap-4 mb-8">
         {myTeams.map((t) => (
@@ -54,7 +53,7 @@ export default function DistrictDashboard() {
               {t.registered && <CheckCircle2 className="text-gold" size={18} />}
             </div>
             <div className="text-white/60 text-sm mt-1">
-              {t.registered ? `${t.teamName} · ${t.players?.length || 0} peserta` : "Belum berdaftar"}
+              Kumpulan {t.group} · {t.registered ? `${t.teamName} · ${t.players?.length || 0} peserta` : "Belum berdaftar"}
             </div>
           </button>
         ))}
@@ -68,7 +67,6 @@ export default function DistrictDashboard() {
             <Field label="Nama Pasukan" value={active.teamName} onChange={(v) => updateTeam(active.teamId, { teamName: v })} />
             <Field label="Nama Pengurus" value={active.managerName} onChange={(v) => updateTeam(active.teamId, { managerName: v })} />
             <Field label="No. Telefon Pengurus" value={active.phone} onChange={(v) => updateTeam(active.teamId, { phone: v })} />
-            <Field label="Email Pengurus" value={active.email} onChange={(v) => updateTeam(active.teamId, { email: v })} />
             <Field label="Kumpulan" value={active.group} disabled />
           </div>
 
@@ -81,24 +79,12 @@ export default function DistrictDashboard() {
 
           <div className="space-y-3">
             {(active.players || []).map((p) => (
-              <div key={p.playerId} className="glass p-4 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <Field label="Nama Penuh" value={p.fullName} onChange={(v) => updatePlayer(active.teamId, p.playerId, { fullName: v })} />
-                <Field label="No. KP / MyKid" value={p.icNumber} onChange={(v) => updatePlayer(active.teamId, p.playerId, { icNumber: v })} />
-                <Field label="Username MLBB" value={p.usernameMLBB} onChange={(v) => updatePlayer(active.teamId, p.playerId, { usernameMLBB: v })} />
+              <div key={p.playerId} className="glass p-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 <Field label="IGN" value={p.ign} onChange={(v) => updatePlayer(active.teamId, p.playerId, { ign: v })} />
-                <div>
-                  <label className="text-xs text-white/60">Role</label>
-                  <select className="field mt-1" value={p.role} onChange={(e) => updatePlayer(active.teamId, p.playerId, { role: e.target.value })}>
-                    {PLAYER_ROLES.map((r) => <option key={r} className="bg-ink">{r}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs text-white/60">Status</label>
-                  <select className="field mt-1" value={p.status} onChange={(e) => updatePlayer(active.teamId, p.playerId, { status: e.target.value })}>
-                    <option className="bg-ink">Utama</option>
-                    <option className="bg-ink">Simpanan</option>
-                  </select>
-                </div>
+                <Field label="Username Profile MLBB" value={p.usernameMLBB} onChange={(v) => updatePlayer(active.teamId, p.playerId, { usernameMLBB: v })} />
+                <Field label="No. Kad OKU" value={p.okuCard} onChange={(v) => updatePlayer(active.teamId, p.playerId, { okuCard: v })} />
+                <Field label="Nama Penuh" value={p.fullName} onChange={(v) => updatePlayer(active.teamId, p.playerId, { fullName: v })} />
+                <Field label="Nama Sekolah" value={p.school} onChange={(v) => updatePlayer(active.teamId, p.playerId, { school: v })} />
                 <div className="flex items-end">
                   <button onClick={() => removePlayer(active.teamId, p.playerId)} className="btn btn-ghost text-sm">
                     <Trash2 size={16} /> Buang

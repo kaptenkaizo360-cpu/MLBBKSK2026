@@ -29,12 +29,12 @@ atau dalam fail `data/districts.js`.
 4. Paparan awam: `/standings`, `/results`, `/semifinal`, `/final`.
 
 Sistem mata: Menang = 3, Kalah = 0.
-Susunan standing: Mata → Menang → Head-to-head → Jumlah Kill.
+Susunan standing: Mata → Menang. Seri = admin tentukan manual. Tiada kiraan kill.
 Dua teratas setiap kumpulan layak separuh akhir.
 
 ## Penyimpanan Data
 
-Versi demo guna `localStorage` (mock database) dengan event `mlbb-update` untuk live-refresh
+Versi demo guna `localStorage` (mock database, kunci mlbb_store_v2) dengan event `mlbb-update` untuk live-refresh
 dalam tab yang sama dan event `storage` untuk antara tab.
 Struktur data (`USERS`, `TEAMS`, `PLAYERS`, `MATCHES`, `STANDINGS`) sudah disusun supaya
 mudah disambung ke Firebase/Firestore kemudian — gantikan fungsi dalam `lib/store.js`

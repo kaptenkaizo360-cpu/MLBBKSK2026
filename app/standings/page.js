@@ -28,7 +28,7 @@ export default function Standings() {
         </div>
       ))}
       <p className="text-white/50 text-xs">
-        Susunan: Mata → Menang → Head-to-head → Jumlah Kill. Dua teratas setiap kumpulan layak separuh akhir.
+        Susunan: Mata → Menang. Jika seri, admin tentukan secara manual. Dua teratas setiap kumpulan layak separuh akhir.
       </p>
     </div>
   );
