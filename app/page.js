@@ -34,7 +34,7 @@ export default function Home() {
           <Gamepad2 size={16} /> E-Sport Pendidikan Khas
         </div>
         <h1 className="font-display font-black text-3xl sm:text-5xl lg:text-6xl leading-tight">
-          PERTANDINGAN <span className="gold-text">MOBILE LEGEND</span><br />
+          PERTANDINGAN <span className="title-rgb">MOBILE LEGEND</span><br />
           PENDIDIKAN KHAS NEGERI JOHOR
         </h1>
         <p className="text-white/70 mt-5 max-w-2xl mx-auto">

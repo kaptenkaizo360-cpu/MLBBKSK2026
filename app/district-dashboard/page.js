@@ -2,7 +2,7 @@
 import { useState, useMemo } from "react";
 import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
-import { Trash2, Save, UserPlus, CheckCircle2 } from "lucide-react";
+import { Trash2, Save, UserPlus, CheckCircle2, RotateCcw } from "lucide-react";
 
 export default function DistrictDashboard() {
   const { session, ready } = useGuard(["district"]);
@@ -37,6 +37,16 @@ export default function DistrictDashboard() {
   function removePlayer(teamId, pid) {
     const t = store.teams.find((x) => x.teamId === teamId);
     updateTeam(teamId, { players: t.players.filter((p) => p.playerId !== pid) });
+  }
+  function resetTeam(teamId) {
+    const ok = window.confirm(
+      "PERINGATAN: Ini akan PADAM semua maklumat pasukan & peserta ini.\n\nPastikan data penting telah disimpan. Teruskan reset?"
+    );
+    if (!ok) return;
+    updateTeam(teamId, {
+      school: "", managerName: "", phone: "", email: "",
+      registered: false, players: [],
+    });
   }
 
   return (
@@ -97,10 +107,15 @@ export default function DistrictDashboard() {
             )}
           </div>
 
-          <button onClick={() => updateTeam(active.teamId, { registered: true })}
-            className="btn btn-gold mt-6">
-            <Save size={18} /> {active.registered ? "Kemaskini Pendaftaran" : "Hantar Pendaftaran"}
-          </button>
+          <div className="flex flex-wrap gap-3 mt-6">
+            <button onClick={() => updateTeam(active.teamId, { registered: true })}
+              className="btn btn-gold">
+              <Save size={18} /> {active.registered ? "Kemaskini Pendaftaran" : "Hantar Pendaftaran"}
+            </button>
+            <button onClick={() => resetTeam(active.teamId)} className="btn btn-danger">
+              <RotateCcw size={18} /> Reset Pasukan Ini
+            </button>
+          </div>
         </div>
       )}
     </div>
