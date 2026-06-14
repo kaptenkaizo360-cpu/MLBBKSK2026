@@ -48,18 +48,12 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 glass !rounded-none border-x-0 border-t-0">
       {/* Semua di sebelah kiri */}
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
-        {/* Logo karnival (Home) + logo esports baharu */}
+        {/* Logo e-sports sebagai butang Home (klik = ke home + logout) */}
         <button onClick={goHome} className="flex items-center gap-2 group shrink-0">
           <img
-            src="/logo-karnival.jpg"
-            alt="Karnival Sukan PPKI Daerah Kluang — Home"
-            className="h-11 w-11 rounded-full object-cover border border-gold/40 group-hover:scale-105 transition"
-            onError={(e) => { e.currentTarget.style.display = "none"; }}
-          />
-          <img
             src="/logo-esports.jpeg"
-            alt="E-Sports MLBB Pendidikan Khas Negeri Johor"
-            className="h-11 w-11 rounded-full object-cover border border-gold/40 group-hover:scale-105 transition hidden sm:block"
+            alt="E-Sports MLBB Pendidikan Khas Negeri Johor — Home"
+            className="h-11 w-11 rounded-full object-cover border border-gold/50 group-hover:scale-105 transition shadow-goldglow"
             onError={(e) => { e.currentTarget.style.display = "none"; }}
           />
           <span className="title-rgb font-display font-bold tracking-wide text-sm sm:text-base whitespace-nowrap">
@@ -78,6 +72,8 @@ export default function Navbar() {
             <div className="flex items-center gap-3">
               <span className="text-gold/80 text-sm hidden lg:inline">{session.label}</span>
               <button onClick={logout} className="btn btn-gold text-sm">
+                <img src="/logo-esports.jpeg" alt="" className="h-5 w-5 rounded-full object-cover"
+                  onError={(e) => { e.currentTarget.style.display = "none"; }} />
                 <LogOut size={16} /> Log Keluar
               </button>
             </div>
@@ -102,6 +98,8 @@ export default function Navbar() {
             <>
               <span className="text-gold/80 text-sm">{session.label}</span>
               <button onClick={logout} className="btn btn-gold text-sm w-fit">
+                <img src="/logo-esports.jpeg" alt="" className="h-5 w-5 rounded-full object-cover"
+                  onError={(e) => { e.currentTarget.style.display = "none"; }} />
                 <LogOut size={16} /> Log Keluar
               </button>
             </>

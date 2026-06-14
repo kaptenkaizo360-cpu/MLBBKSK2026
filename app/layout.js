@@ -12,6 +12,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="ms">
       <body className="bg-arena min-h-screen animate-moveGrad">
+        {/* Logo e-sports sebagai latar samar (tidak ganggu bacaan) */}
+        <div className="brand-bg" aria-hidden="true" />
         <Navbar />
         <main className="min-h-[70vh]">{children}</main>
         <Footer />

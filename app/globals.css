@@ -78,6 +78,25 @@ html, body {
 
 main, header, footer { position: relative; z-index: 1; }
 
+/* Logo e-sports sebagai latar samar di tengah, berdenyut perlahan */
+.brand-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("/logo-esports.jpeg");
+  background-repeat: no-repeat;
+  background-position: center 18%;
+  background-size: min(70vw, 620px);
+  opacity: 0.06;
+  filter: saturate(1.1);
+  animation: brandPulse 9s ease-in-out infinite;
+}
+@keyframes brandPulse {
+  0%,100% { opacity: 0.05; }
+  50%     { opacity: 0.09; }
+}
+
 .glass {
   background: rgba(10,26,63,0.55);
   border: 1px solid rgba(212,175,55,0.30);

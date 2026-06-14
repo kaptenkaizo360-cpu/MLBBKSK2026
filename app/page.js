@@ -20,11 +20,8 @@ export default function Home() {
     <div className="max-w-7xl mx-auto px-4">
       {/* HERO */}
       <section className="text-center py-16 sm:py-24">
-        {/* Logo Mobile Legend, Johor Leads & E-Sports bersebelahan */}
+        {/* Logo Johor Leads & E-Sports bersebelahan */}
         <div className="flex items-center justify-center gap-5 sm:gap-8 mb-8 flex-wrap">
-          <img src="/logo-mlbb.png" alt="Mobile Legends Bang Bang"
-            className="h-16 sm:h-24 w-auto object-contain drop-shadow-[0_0_18px_rgba(212,175,55,0.45)]"
-            onError={(e) => { e.currentTarget.style.display = "none"; }} />
           <img src="/logo.png" alt="Johor Leads"
             className="h-16 sm:h-24 w-auto object-contain drop-shadow-[0_0_18px_rgba(212,175,55,0.45)]"
             onError={(e) => { e.currentTarget.style.display = "none"; }} />
