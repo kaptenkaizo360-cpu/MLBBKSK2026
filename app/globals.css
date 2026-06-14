@@ -78,26 +78,85 @@ html, body {
 
 main, header, footer { position: relative; z-index: 1; }
 
-/* Logo e-sports sebagai latar besar yang bergerak perlahan */
+/* Logo e-sports sebagai latar PENUH (cover) dengan kesan kilat gaming */
 .brand-bg {
   position: fixed;
-  inset: -10%;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
   background-image: url("/logo-esports.jpeg");
   background-repeat: no-repeat;
-  background-position: center 12%;
-  background-size: min(115vw, 1000px);
-  opacity: 0.10;
-  filter: saturate(1.15);
-  animation: brandFloat 22s ease-in-out infinite;
+  background-position: center center;
+  background-size: cover;
+  opacity: 0.16;
+  filter: saturate(1.25) contrast(1.05);
+  animation: brandKenburns 26s ease-in-out infinite;
 }
-@keyframes brandFloat {
-  0%   { transform: translate3d(-2%, 0, 0) scale(1);    opacity: 0.08; }
-  25%  { transform: translate3d(1%, -2%, 0) scale(1.05); opacity: 0.12; }
-  50%  { transform: translate3d(2%, 1%, 0) scale(1.08);  opacity: 0.10; }
-  75%  { transform: translate3d(-1%, 2%, 0) scale(1.04); opacity: 0.12; }
-  100% { transform: translate3d(-2%, 0, 0) scale(1);     opacity: 0.08; }
+@keyframes brandKenburns {
+  0%   { transform: scale(1.05) translate3d(0,0,0); }
+  50%  { transform: scale(1.15) translate3d(1%, -1.5%, 0); }
+  100% { transform: scale(1.05) translate3d(0,0,0); }
+}
+
+/* Lapisan kilat — flash putih-biru menyambar */
+.lightning {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  background:
+    linear-gradient(120deg, transparent 0%, rgba(120,180,255,0.0) 40%, rgba(150,200,255,0.55) 50%, rgba(120,180,255,0.0) 60%, transparent 100%);
+  animation: lightningFlash 7s linear infinite;
+}
+.lightning.bolt2 { animation: lightningFlash2 9s linear infinite; }
+
+/* Denyar kilat penuh skrin (cahaya menyambar) */
+@keyframes lightningFlash {
+  0%, 100% { opacity: 0; }
+  47% { opacity: 0; }
+  48% { opacity: 0.9; }
+  49% { opacity: 0.2; }
+  50% { opacity: 0.85; }
+  51% { opacity: 0; }
+  70% { opacity: 0; }
+  71% { opacity: 0.6; }
+  72% { opacity: 0; }
+}
+@keyframes lightningFlash2 {
+  0%, 100% { opacity: 0; }
+  29% { opacity: 0; }
+  30% { opacity: 0.7; }
+  31% { opacity: 0.1; }
+  32% { opacity: 0.6; }
+  33% { opacity: 0; }
+  85% { opacity: 0; }
+  86% { opacity: 0.5; }
+  87% { opacity: 0; }
+}
+
+/* Garis petir (bolt) yang berkelip */
+.bolt-svg {
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  filter: drop-shadow(0 0 8px rgba(150,200,255,0.9));
+  animation: boltStrike 6.5s linear infinite;
+}
+.bolt-svg.b2 { animation: boltStrike2 8.5s linear infinite; }
+@keyframes boltStrike {
+  0%, 46%, 53%, 100% { opacity: 0; }
+  48% { opacity: 1; }
+  50% { opacity: 0.3; }
+  52% { opacity: 0.9; }
+}
+@keyframes boltStrike2 {
+  0%, 28%, 35%, 100% { opacity: 0; }
+  30% { opacity: 1; }
+  32% { opacity: 0.4; }
+  34% { opacity: 0.8; }
 }
 
 .glass {
@@ -159,7 +218,9 @@ main, header, footer { position: relative; z-index: 1; }
 input::placeholder { color: rgba(255,255,255,.4); }
 
 @media (prefers-reduced-motion: reduce) {
-  .bg-arena::before, .bg-arena::after, .title-rgb, .animate-moveGrad { animation: none; }
+  .bg-arena::before, .bg-arena::after, .title-rgb, .animate-moveGrad,
+  .brand-bg, .lightning, .bolt-svg { animation: none; }
+  .lightning, .bolt-svg { opacity: 0 !important; }
 }
 
 /* ===== Gaya cetakan PDF (senarai peserta) ===== */
@@ -170,7 +231,7 @@ input::placeholder { color: rgba(255,255,255,.4); }
   #print-area, #print-area * { visibility: visible; }
   #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
 
-  header, footer, .no-print, .brand-bg { display: none !important; }
+  header, footer, .no-print, .brand-bg, .lightning, .bolt-svg { display: none !important; }
 
   /* Latar putih, teks hitam untuk jimat dakwat & jelas */
   html, body { background: #fff !important; color: #000 !important; }
