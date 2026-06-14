@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Orbitron", "Arial Black", sans-serif;
+  --font-body: "Rajdhani", system-ui, sans-serif;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap");
+
+html, body {
+  background: #111827;
+  color: #fff;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.bg-arena {
+  background:
+    radial-gradient(900px 500px at 12% -10%, rgba(4,106,56,0.45), transparent 60%),
+    radial-gradient(700px 400px at 95% 10%, rgba(212,175,55,0.18), transparent 60%),
+    linear-gradient(135deg, #013220 0%, #06281c 45%, #111827 100%);
+  background-size: 200% 200%;
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(212,175,55,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,175,55,0.06) 1px, transparent 1px);
+  background-size: 38px 38px;
+}
+
+.glass {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(212,175,55,0.25);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+}
+
+.gold-text {
+  background: linear-gradient(180deg, #F2C94C, #D4AF37);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.btn {
+  display: inline-flex; align-items: center; gap: .5rem;
+  padding: .7rem 1.3rem; border-radius: 9999px; font-weight: 600;
+  transition: transform .15s ease, box-shadow .2s ease;
+}
+.btn:hover { transform: scale(1.04); }
+.btn-gold { background: linear-gradient(180deg,#F2C94C,#D4AF37); color:#111827; box-shadow:0 0 20px rgba(212,175,55,.4); }
+.btn-emerald { background: linear-gradient(180deg,#046A38,#013220); color:#fff; border:1px solid rgba(212,175,55,.35); }
+.btn-ghost { background: transparent; color:#F2C94C; border:1px solid rgba(212,175,55,.45); }
+
+.field {
+  width:100%; padding:.6rem .8rem; border-radius:.6rem;
+  background: rgba(0,0,0,.35); border:1px solid rgba(212,175,55,.25); color:#fff;
+}
+.field:focus { outline:none; border-color:#F2C94C; box-shadow:0 0 0 2px rgba(242,201,76,.25); }
+
+.row-hover:hover { background: rgba(212,175,55,0.07); }
+
+input::placeholder { color: rgba(255,255,255,.4); }
