@@ -70,3 +70,28 @@ components/           # Navbar, Footer, Tables, useStore, useGuard
 lib/                  # store.js (logik standing/jadual), auth.js
 data/                 # districts.js (daerah, login, kumpulan)
 ```
+
+## Google Sheet sebagai pangkalan data (data dikongsi semua user)
+
+Sistem guna Google Sheet (ID `1KFwkaFP1F956Hjv89UL-KiaFK_Bnme75jdbRsLGCpaA`)
+sebagai sumber utama. Semua user — daerah, host, admin — baca & tulis ke Sheet
+yang sama, jadi semua nampak data yang sama. Paparan disegerak setiap 5 saat.
+localStorage cuma cache supaya laju & boleh jalan walau internet putus seketika.
+
+Langkah pasang:
+
+1. Buka Google Sheet tersebut -> Extensions -> Apps Script.
+2. Tampal kandungan `apps-script/Code.gs`, Save.
+3. Deploy -> New deployment -> Web app -> Execute as: Me, Who has access: Anyone -> Deploy.
+4. Salin Web app URL.
+5. Buat `.env.local` (salin dari `.env.local.example`):
+   NEXT_PUBLIC_SHEET_SYNC_URL=https://script.google.com/macros/s/XXXX/exec
+   Untuk Vercel: Settings -> Environment Variables -> tambah pemboleh ubah sama.
+6. Restart `npm run dev` (atau redeploy Vercel).
+
+Sheet akan ada tab: _DATA (JSON penuh, tersembunyi), Pasukan, Peserta, Keputusan.
+Status sambungan dipaparkan di Dashboard Admin.
+Jika URL tidak diset, sistem jalan dalam pelayar sahaja (tidak dikongsi).
+
+PENTING: setiap kali kod Apps Script diubah, buat Deploy -> Manage deployments
+-> Edit -> Version: New version supaya perubahan naik.

@@ -1,15 +1,24 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
 import { resetStore, semifinalPairs, setKnockout, leagueComplete } from "@/lib/store";
+import { syncNow, getSyncStatus, syncEnabled } from "@/lib/sync";
 import { DISTRICTS, CATEGORIES } from "@/data/districts";
-import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy } from "lucide-react";
+import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy, Cloud, CloudOff, RefreshCw } from "lucide-react";
 
 export default function AdminDashboard() {
   const { ready } = useGuard(["admin"]);
   const { store, commit, refresh } = useStore();
   const [tab, setTab] = useState("teams");
+  const [syncState, setSyncState] = useState("idle");
+
+  useEffect(() => {
+    setSyncState(getSyncStatus());
+    const onSync = (e) => setSyncState(e.detail);
+    window.addEventListener("mlbb-sync", onSync);
+    return () => window.removeEventListener("mlbb-sync", onSync);
+  }, []);
 
   if (!ready || !store) return <div className="text-center py-20 text-white/60">Memuatkan…</div>;
 
@@ -47,7 +56,10 @@ export default function AdminDashboard() {
     <div className="max-w-7xl mx-auto px-4 py-10">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display gold-text text-2xl font-bold">Dashboard Admin Negeri</h1>
-        <button onClick={exportCSV} className="btn btn-gold text-sm"><Download size={16} /> Export CSV</button>
+        <div className="flex items-center gap-3">
+          <SyncBadge state={syncState} />
+          <button onClick={exportCSV} className="btn btn-gold text-sm"><Download size={16} /> Export CSV</button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2 my-6">
@@ -182,9 +194,32 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="glass p-6">
+            <h3 className="font-display gold-text mb-3 flex items-center gap-2">
+              {syncEnabled() ? <Cloud size={18} /> : <CloudOff size={18} />} Pangkalan Data Google Sheet
+            </h3>
+            {syncEnabled() ? (
+              <>
+                <p className="text-white/60 text-sm mb-4">
+                  Semua user kongsi data dari Sheet ini. Setiap perubahan disimpan terus,
+                  dan paparan disegerak setiap beberapa saat. Status: <SyncWord state={syncState} />
+                </p>
+                <button onClick={() => syncNow(store)} className="btn btn-gold text-sm">
+                  <RefreshCw size={16} /> Simpan ke Sheet Sekarang
+                </button>
+              </>
+            ) : (
+              <p className="text-white/60 text-sm">
+                Sheet belum diaktifkan — data sekarang dalam pelayar ini sahaja. Pasang Apps Script
+                (lihat folder <span className="font-mono text-gold">apps-script</span>) dan set{" "}
+                <span className="font-mono text-gold">NEXT_PUBLIC_SHEET_SYNC_URL</span> dalam{" "}
+                <span className="font-mono">.env.local</span> atau Vercel.
+              </p>
+            )}
+          </div>
+          <div className="glass p-6">
             <h3 className="font-display gold-text mb-3">Tetapan Sistem</h3>
             <p className="text-white/60 text-sm mb-4">Reset semula keseluruhan data demo (pasukan, peserta, keputusan).</p>
-            <button onClick={() => { resetStore(); refresh(); }} className="btn btn-ghost text-sm">
+            <button onClick={() => { const s = resetStore(); refresh(); syncNow(s); }} className="btn btn-ghost text-sm">
               <RotateCcw size={16} /> Reset Data Pertandingan
             </button>
           </div>
@@ -227,4 +262,27 @@ function KOSelectTeams({ cat, store, value, onChange }) {
       </select>
     </div>
   );
+}
+
+function SyncBadge({ state }) {
+  const map = {
+    disabled: { t: "Sheet tak aktif", c: "text-white/50", I: CloudOff },
+    idle: { t: "Sheet sedia", c: "text-white/70", I: Cloud },
+    loading: { t: "Memuat dari Sheet…", c: "text-mustard", I: RefreshCw },
+    syncing: { t: "Menyimpan ke Sheet…", c: "text-mustard", I: RefreshCw },
+    ok: { t: "Segerak dengan Sheet", c: "text-emerald-200", I: Cloud },
+    error: { t: "Sheet tak dapat dihubungi", c: "text-red-300", I: CloudOff },
+  };
+  const s = map[state] || map.idle;
+  const I = s.I;
+  return (
+    <span className={`inline-flex items-center gap-1.5 text-xs glass px-3 py-1.5 ${s.c}`}>
+      <I size={14} className={(state === "syncing" || state === "loading") ? "animate-spin" : ""} /> {s.t}
+    </span>
+  );
+}
+
+function SyncWord({ state }) {
+  const label = { disabled: "tidak aktif", idle: "sedia", loading: "memuat…", syncing: "menyimpan…", ok: "segerak", error: "gagal" };
+  return <span className="gold-text font-semibold">{label[state] || "sedia"}</span>;
 }
