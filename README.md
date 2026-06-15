@@ -14,8 +14,8 @@ Buka http://localhost:3000
 
 ## Login Demo
 
-**Admin** — `ADMINMLBBJOHOR` / `Admin@Johor2026`
-**Host** — `HOSTMLBBJOHOR` / `Host@MLBB2026`
+**Admin** — `ADMINMLBBJOHOR` / `avadakadabra360`
+**Host** — `HOSTMLBBJOHOR` / `avadakadabra`
 **Daerah** (contoh Kluang) — `MLBBKLUANG` / `aVbx#6aj7vqx`
 
 Senarai penuh kredensial daerah ada dalam Dashboard Admin → tab "Data & Tetapan",

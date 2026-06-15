@@ -14,8 +14,8 @@ export const DISTRICTS = [
   { name: "Pontian", userId: "MLBBPONTIAN", password: "K2fR$m5&aYrp" },
 ];
 
-export const HOST = { userId: "HOSTMLBBJOHOR", password: "Host@MLBB2026" };
-export const ADMIN = { userId: "ADMINMLBBJOHOR", password: "Admin@Johor2026" };
+export const HOST = { userId: "HOSTMLBBJOHOR", password: "avadakadabra" };
+export const ADMIN = { userId: "ADMINMLBBJOHOR", password: "avadakadabra360" };
 
 export const CATEGORIES = ["Sekolah Rendah", "Sekolah Menengah"];
 
