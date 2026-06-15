@@ -248,12 +248,9 @@ export default function AdminDashboard() {
                               {players.map((p, i) => (
                                 <tr key={p.playerId} className="border-t border-white/5">
                                   <td className="px-3 py-2 text-white/60">{i + 1}</td>
-                                  <td className="px-2 py-1"><input className="field !py-1 text-sm print-plain" value={p.fullName || ""}
-                                    onChange={(e) => editPlayer(p.teamId, p.playerId, { fullName: e.target.value })} /></td>
-                                  <td className="px-2 py-1"><input className="field !py-1 text-sm print-plain" value={p.ign || ""}
-                                    onChange={(e) => editPlayer(p.teamId, p.playerId, { ign: e.target.value })} /></td>
-                                  <td className="px-2 py-1"><input className="field !py-1 text-sm print-plain" value={p.mlId || ""}
-                                    onChange={(e) => editPlayer(p.teamId, p.playerId, { mlId: e.target.value })} /></td>
+                                  <td className="px-2 py-1"><EditCell value={p.fullName} onSave={(v) => editPlayer(p.teamId, p.playerId, { fullName: v })} /></td>
+                                  <td className="px-2 py-1"><EditCell value={p.ign} onSave={(v) => editPlayer(p.teamId, p.playerId, { ign: v })} /></td>
+                                  <td className="px-2 py-1"><EditCell value={p.mlId} onSave={(v) => editPlayer(p.teamId, p.playerId, { mlId: v })} /></td>
                                 </tr>
                               ))}
                             </tbody>
@@ -488,4 +485,20 @@ function SyncBadge({ state }) {
 function SyncWord({ state }) {
   const label = { disabled: "tidak aktif", idle: "sedia", loading: "memuat…", syncing: "menyimpan…", ok: "segerak", error: "gagal" };
   return <span className="gold-text font-semibold">{label[state] || "sedia"}</span>;
+}
+
+// Sel boleh edit — state tempatan, simpan bila hilang fokus (taip lancar)
+function EditCell({ value, onSave }) {
+  const [local, setLocal] = useState(value || "");
+  const [focused, setFocused] = useState(false);
+  useEffect(() => { if (!focused) setLocal(value || ""); }, [value, focused]);
+  return (
+    <input
+      className="field !py-1 text-sm print-plain"
+      value={local}
+      onFocus={() => setFocused(true)}
+      onChange={(e) => setLocal(e.target.value)}
+      onBlur={() => { setFocused(false); if (local !== (value || "")) onSave(local); }}
+    />
+  );
 }

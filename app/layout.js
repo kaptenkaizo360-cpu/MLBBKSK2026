@@ -20,6 +20,11 @@ export default function RootLayout({ children }) {
       <body className="bg-arena min-h-screen animate-moveGrad">
         {/* Logo e-sports sebagai latar penuh */}
         <div className="brand-bg" aria-hidden="true" />
+        {/* Lapisan gaming bombastik */}
+        <div className="energy-sweep" aria-hidden="true" />
+        <div className="gaming-grid" aria-hidden="true" />
+        <div className="particles" aria-hidden="true" />
+        <div className="scanlines" aria-hidden="true" />
         {/* Kesan kilat / lightning gaming */}
         <div className="lightning" aria-hidden="true" />
         <div className="lightning bolt2" aria-hidden="true" />
@@ -32,9 +37,12 @@ export default function RootLayout({ children }) {
           <path d="M30 0 L12 120 L26 120 L6 300 L44 110 L26 110 L38 0 Z"
             fill="rgba(170,205,255,0.85)" stroke="rgba(225,240,255,0.9)" strokeWidth="1.5" />
         </svg>
+        <div className="vignette" aria-hidden="true" />
         <Navbar />
-        <main className="min-h-[70vh]">{children}</main>
-        <Footer />
+        <div className="md:pl-60">
+          <main className="min-h-[70vh]">{children}</main>
+          <Footer />
+        </div>
       </body>
     </html>
   );

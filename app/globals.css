@@ -235,7 +235,7 @@ input::placeholder { color: rgba(255,255,255,.4); }
   #print-area, #print-area * { visibility: visible; }
   #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
 
-  header, footer, .no-print, .brand-bg, .lightning, .bolt-svg { display: none !important; }
+  header, footer, .no-print, .brand-bg, .lightning, .bolt-svg, .gaming-grid, .scanlines, .particles, .energy-sweep, .vignette { display: none !important; }
 
   /* Latar putih, teks hitam untuk jimat dakwat & jelas */
   html, body { background: #fff !important; color: #000 !important; }
@@ -265,4 +265,108 @@ input::placeholder { color: rgba(255,255,255,.4); }
 }
 @media (prefers-reduced-motion: reduce) {
   .live-glow { animation: none; }
+}
+
+/* ============ KESAN GAMING BOMBASTIK ============ */
+
+/* Grid neon perspektif (lantai gaming) yang bergerak */
+.gaming-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(212,175,55,0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(80,140,255,0.08) 1px, transparent 1px);
+  background-size: 46px 46px;
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 55%, #000 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 55%, #000 100%);
+  animation: gridScroll 8s linear infinite;
+}
+@keyframes gridScroll {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 0 46px, 0 46px; }
+}
+
+/* Garis imbas (scanline) gaya skrin gaming */
+.scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.025) 0px,
+    rgba(255,255,255,0.025) 1px,
+    transparent 2px,
+    transparent 4px
+  );
+  opacity: 0.5;
+  animation: scanMove 9s linear infinite;
+}
+@keyframes scanMove {
+  from { background-position: 0 0; }
+  to   { background-position: 0 100px; }
+}
+
+/* Zarah tenaga terapung (gaming particles) */
+.particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(2px 2px at 10% 80%, rgba(242,201,76,0.9), transparent),
+    radial-gradient(2px 2px at 30% 60%, rgba(90,150,255,0.8), transparent),
+    radial-gradient(1.5px 1.5px at 50% 90%, rgba(242,201,76,0.7), transparent),
+    radial-gradient(2px 2px at 70% 70%, rgba(90,150,255,0.8), transparent),
+    radial-gradient(1.5px 1.5px at 85% 85%, rgba(242,201,76,0.7), transparent),
+    radial-gradient(2px 2px at 20% 95%, rgba(120,180,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 60% 75%, rgba(242,201,76,0.6), transparent);
+  animation: particleRise 14s linear infinite;
+}
+@keyframes particleRise {
+  0%   { transform: translateY(0); opacity: 0.7; }
+  50%  { opacity: 1; }
+  100% { transform: translateY(-60vh); opacity: 0; }
+}
+
+/* Pancaran cahaya menyapu (sweeping glow) */
+.energy-sweep {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 120%, rgba(80,140,255,0.18), transparent 55%);
+  animation: energyPulse 5s ease-in-out infinite;
+}
+@keyframes energyPulse {
+  0%,100% { opacity: 0.5; transform: scale(1); }
+  50%     { opacity: 0.9; transform: scale(1.08); }
+}
+
+/* Vignette gelap tepi supaya fokus tengah */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(2,6,18,0.65) 100%);
+}
+
+/* Logo gaming kecil dalam sidebar — berputar lembut + glow */
+.gaming-emblem {
+  animation: emblemSpin 12s linear infinite, emblemGlow 3s ease-in-out infinite;
+}
+@keyframes emblemSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes emblemGlow {
+  0%,100% { filter: drop-shadow(0 0 3px rgba(212,175,55,0.5)); }
+  50%     { filter: drop-shadow(0 0 12px rgba(242,201,76,0.95)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gaming-grid, .scanlines, .particles, .energy-sweep, .gaming-emblem { animation: none; }
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
 import { Trash2, Save, UserPlus, CheckCircle2, RotateCcw, Lock, Pencil } from "lucide-react";
@@ -10,65 +10,71 @@ export default function DistrictDashboard() {
   const { session, ready } = useGuard(["district"]);
   const { store, commit } = useStore();
   const [activeId, setActiveId] = useState(null);
-  const [editingId, setEditingId] = useState(null); // pasukan yang sedang dibuka untuk edit
+  const [editing, setEditing] = useState(false); // sedang isi/edit borang
+  const [draft, setDraft] = useState(null);       // salinan tempatan (apa yang ditaip)
 
   const myTeams = useMemo(
     () => (store && session ? store.teams.filter((t) => t.district === session.district) : []),
     [store, session]
   );
 
+  // Pasukan asal dari store (untuk paparan bila tidak edit)
+  const activeOriginal = myTeams.find((t) => t.teamId === activeId);
+
+  // Bila pilih pasukan baru, tutup mod edit
+  useEffect(() => { setEditing(false); setDraft(null); }, [activeId]);
+
   if (!ready || !store) return <Loading />;
 
-  const active = myTeams.find((t) => t.teamId === activeId);
-  // Dikunci jika sudah berdaftar DAN tidak dalam mod edit
-  const locked = active?.registered && editingId !== active?.teamId;
+  // Data yang dipaparkan: draf bila edit, asal bila tidak
+  const active = editing && draft ? draft : activeOriginal;
+  const locked = activeOriginal?.registered && !editing;
 
-  function updateTeam(teamId, patch) {
-    const next = { ...store, teams: store.teams.map((t) => t.teamId === teamId ? { ...t, ...patch } : t) };
-    commit(next);
+  function openTeam(teamId) {
+    setActiveId(teamId);
   }
-  function addPlayer(teamId) {
-    const t = store.teams.find((x) => x.teamId === teamId);
-    if ((t.players || []).length >= MAX_PLAYERS) {
-      window.alert(`Maksimum ${MAX_PLAYERS} peserta sahaja dibenarkan bagi setiap pasukan.`);
-      return;
-    }
-    const players = [...(t.players || []), {
-      playerId: `P${Date.now()}`,
-      fullName: "", ign: "", mlId: "",
-    }];
-    updateTeam(teamId, { players });
+  function startEdit() {
+    // Salin data store ke draf tempatan — taip pada draf, tak sentuh store/Sheet
+    setDraft(JSON.parse(JSON.stringify(activeOriginal)));
+    setEditing(true);
   }
-  function updatePlayer(teamId, pid, patch) {
-    const t = store.teams.find((x) => x.teamId === teamId);
-    updateTeam(teamId, { players: t.players.map((p) => p.playerId === pid ? { ...p, ...patch } : p) });
+  // Kemaskini DRAF sahaja (tiada sync, tiada lag, tiada timpa)
+  function setField(patch) {
+    setDraft((d) => ({ ...d, ...patch }));
   }
-  function removePlayer(teamId, pid) {
-    const t = store.teams.find((x) => x.teamId === teamId);
-    updateTeam(teamId, { players: t.players.filter((p) => p.playerId !== pid) });
+  function setPlayer(pid, patch) {
+    setDraft((d) => ({ ...d, players: (d.players || []).map((p) => p.playerId === pid ? { ...p, ...patch } : p) }));
   }
-  function saveTeam(teamId) {
+  function addPlayer() {
+    setDraft((d) => {
+      if ((d.players || []).length >= MAX_PLAYERS) {
+        window.alert(`Maksimum ${MAX_PLAYERS} peserta sahaja dibenarkan bagi setiap pasukan.`);
+        return d;
+      }
+      return { ...d, players: [...(d.players || []), { playerId: `P${Date.now()}`, fullName: "", ign: "", mlId: "" }] };
+    });
+  }
+  function removePlayer(pid) {
+    setDraft((d) => ({ ...d, players: (d.players || []).filter((p) => p.playerId !== pid) }));
+  }
+
+  // SIMPAN — barulah tulis draf ke store + Sheet
+  function saveTeam() {
     const ok = window.confirm("Adakah anda pasti untuk menyimpan data ini?");
     if (!ok) return;
-    updateTeam(teamId, { registered: true });
-    setEditingId(null);
-    window.alert(
-      "Data telah disimpan.\n\nUntuk membetulkan maklumat selepas ini, tekan butang 'Edit Maklumat'."
-    );
+    const saved = { ...draft, registered: true };
+    commit({ ...store, teams: store.teams.map((t) => t.teamId === saved.teamId ? saved : t) });
+    setEditing(false);
+    setDraft(null);
+    window.alert("Data telah disimpan.\n\nUntuk membetulkan maklumat, tekan butang 'Edit Maklumat'.");
   }
-  function startEdit(teamId) {
-    setEditingId(teamId);
-  }
-  function resetTeam(teamId) {
-    const ok = window.confirm(
-      "PERINGATAN: Ini akan PADAM semua maklumat pasukan & peserta ini supaya anda boleh isi semula.\n\nTeruskan reset?"
-    );
+  function resetTeam() {
+    const ok = window.confirm("PERINGATAN: Ini akan PADAM semua maklumat pasukan & peserta ini.\n\nTeruskan reset?");
     if (!ok) return;
-    updateTeam(teamId, {
-      school: "", managerName: "", phone: "", email: "",
-      registered: false, players: [],
-    });
-    setEditingId(null);
+    const cleared = { ...activeOriginal, school: "", managerName: "", phone: "", email: "", registered: false, players: [] };
+    commit({ ...store, teams: store.teams.map((t) => t.teamId === cleared.teamId ? cleared : t) });
+    setEditing(false);
+    setDraft(null);
   }
 
   return (
@@ -78,7 +84,7 @@ export default function DistrictDashboard() {
 
       <div className="grid md:grid-cols-2 gap-4 mb-8">
         {myTeams.map((t) => (
-          <button key={t.teamId} onClick={() => setActiveId(t.teamId)}
+          <button key={t.teamId} onClick={() => openTeam(t.teamId)}
             className={`glass p-5 text-left transition ${activeId === t.teamId ? "shadow-goldglow" : ""}`}>
             <div className="flex items-center justify-between">
               <span className="font-display text-lg">{t.category}</span>
@@ -100,18 +106,23 @@ export default function DistrictDashboard() {
                 <span className="inline-flex items-center gap-1.5 text-xs glass px-3 py-1.5 text-gold">
                   <Lock size={14} /> Disimpan
                 </span>
-                <button onClick={() => startEdit(active.teamId)} className="btn btn-gold text-sm">
+                <button onClick={startEdit} className="btn btn-gold text-sm">
                   <Pencil size={14} /> Edit Maklumat
                 </button>
               </div>
             )}
+            {!locked && !editing && !activeOriginal?.registered && (
+              <button onClick={startEdit} className="btn btn-gold text-sm">
+                <Pencil size={14} /> Mula Isi
+              </button>
+            )}
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Nama Sekolah" value={active.school} disabled={locked} onChange={(v) => updateTeam(active.teamId, { school: v })} />
-            <Field label="Nama Pasukan" value={active.teamName} disabled={locked} onChange={(v) => updateTeam(active.teamId, { teamName: v })} />
-            <Field label="Nama Pengurus" value={active.managerName} disabled={locked} onChange={(v) => updateTeam(active.teamId, { managerName: v })} />
-            <Field label="No. Telefon Pengurus" value={active.phone} disabled={locked} onChange={(v) => updateTeam(active.teamId, { phone: v })} />
+            <Field label="Nama Sekolah" value={active.school} disabled={!editing} onChange={(v) => setField({ school: v })} />
+            <Field label="Nama Pasukan" value={active.teamName} disabled={!editing} onChange={(v) => setField({ teamName: v })} />
+            <Field label="Nama Pengurus" value={active.managerName} disabled={!editing} onChange={(v) => setField({ managerName: v })} />
+            <Field label="No. Telefon Pengurus" value={active.phone} disabled={!editing} onChange={(v) => setField({ phone: v })} />
             <Field label="Kumpulan" value={active.group} disabled />
           </div>
 
@@ -119,25 +130,25 @@ export default function DistrictDashboard() {
             <h3 className="font-display gold-text">
               Senarai Peserta <span className="text-white/50 text-sm font-normal">({(active.players || []).length}/{MAX_PLAYERS})</span>
             </h3>
-            {!locked && (active.players || []).length < MAX_PLAYERS && (
-              <button onClick={() => addPlayer(active.teamId)} className="btn btn-emerald text-sm">
+            {editing && (active.players || []).length < MAX_PLAYERS && (
+              <button onClick={addPlayer} className="btn btn-emerald text-sm">
                 <UserPlus size={16} /> Tambah Peserta
               </button>
             )}
           </div>
-          {!locked && (active.players || []).length >= MAX_PLAYERS && (
+          {editing && (active.players || []).length >= MAX_PLAYERS && (
             <p className="text-gold/80 text-xs mb-3">Maksimum {MAX_PLAYERS} peserta telah dicapai.</p>
           )}
 
           <div className="space-y-3">
             {(active.players || []).map((p) => (
               <div key={p.playerId} className="glass p-4 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <Field label="Nama Penuh" value={p.fullName} disabled={locked} onChange={(v) => updatePlayer(active.teamId, p.playerId, { fullName: v })} />
-                <Field label="IGN" value={p.ign} disabled={locked} onChange={(v) => updatePlayer(active.teamId, p.playerId, { ign: v })} />
-                <Field label="ID" value={p.mlId} disabled={locked} onChange={(v) => updatePlayer(active.teamId, p.playerId, { mlId: v })} />
-                {!locked && (
+                <Field label="Nama Penuh" value={p.fullName} disabled={!editing} onChange={(v) => setPlayer(p.playerId, { fullName: v })} />
+                <Field label="IGN" value={p.ign} disabled={!editing} onChange={(v) => setPlayer(p.playerId, { ign: v })} />
+                <Field label="ID" value={p.mlId} disabled={!editing} onChange={(v) => setPlayer(p.playerId, { mlId: v })} />
+                {editing && (
                   <div className="flex items-end">
-                    <button onClick={() => removePlayer(active.teamId, p.playerId)} className="btn btn-ghost text-sm">
+                    <button onClick={() => removePlayer(p.playerId)} className="btn btn-ghost text-sm">
                       <Trash2 size={16} /> Buang
                     </button>
                   </div>
@@ -145,22 +156,22 @@ export default function DistrictDashboard() {
               </div>
             ))}
             {(active.players || []).length === 0 && (
-              <p className="text-white/50 text-sm">Belum ada peserta. {locked ? "" : 'Tekan "Tambah Peserta".'}</p>
+              <p className="text-white/50 text-sm">Belum ada peserta. {editing ? 'Tekan "Tambah Peserta".' : ""}</p>
             )}
           </div>
 
           <div className="flex flex-wrap gap-3 mt-6">
-            {!locked && (
-              <button onClick={() => saveTeam(active.teamId)} className="btn btn-gold">
-                <Save size={18} /> {active.registered ? "Simpan Perubahan" : "Simpan Data"}
+            {editing && (
+              <button onClick={saveTeam} className="btn btn-gold">
+                <Save size={18} /> {activeOriginal?.registered ? "Simpan Perubahan" : "Simpan Data"}
               </button>
             )}
-            {locked && (
-              <button onClick={() => startEdit(active.teamId)} className="btn btn-emerald">
-                <Pencil size={18} /> Edit Maklumat
+            {editing && (
+              <button onClick={() => { setEditing(false); setDraft(null); }} className="btn btn-ghost">
+                Batal
               </button>
             )}
-            <button onClick={() => resetTeam(active.teamId)} className="btn btn-danger">
+            <button onClick={resetTeam} className="btn btn-danger">
               <RotateCcw size={18} /> Reset Pasukan Ini
             </button>
           </div>

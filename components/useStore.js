@@ -60,6 +60,8 @@ export function useStore() {
     if (!syncEnabled()) return;
     const id = setInterval(async () => {
       if (Date.now() - localTouchedAt.current < POLL_MS) return;
+      const el = typeof document !== "undefined" ? document.activeElement : null;
+      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT")) return;
       try {
         const remote = await fetchStore();
         if (remote) {
