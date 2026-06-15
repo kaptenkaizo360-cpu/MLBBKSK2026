@@ -18,7 +18,11 @@ html, body {
   color: #fff;
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
+  max-width: 100%;
 }
+* { -webkit-tap-highlight-color: transparent; }
+/* Elak melimpah mendatar tanpa memecah sticky navbar */
+#__next, main { overflow-x: clip; }
 
 /* ===== Latar navy + kerawang Johor bergerak ===== */
 .bg-arena {

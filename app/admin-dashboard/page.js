@@ -100,9 +100,13 @@ export default function AdminDashboard() {
     <div className="max-w-7xl mx-auto px-4 py-10">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display gold-text text-2xl font-bold">Dashboard Admin Negeri</h1>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <SyncBadge state={syncState} />
+          <button onClick={saveNow} className="btn btn-emerald text-sm"><Save size={16} /> Simpan</button>
           <button onClick={exportCSV} className="btn btn-gold text-sm"><Download size={16} /> Export CSV</button>
+          <button onClick={() => { if (window.confirm("Reset SEMUA data pertandingan? Tindakan ini tidak boleh dibatalkan.")) { const s = resetStore(); refresh(); syncNow(s); } }} className="btn btn-danger text-sm">
+            <RotateCcw size={16} /> Reset
+          </button>
         </div>
       </div>
 
@@ -138,35 +142,59 @@ export default function AdminDashboard() {
               </div>
             );
           })()}
-          <div className="overflow-x-auto glass p-1">
-            <table className="w-full text-sm">
-              <thead><tr className="text-gold/80 text-left">
-                {["Daerah", "Kategori", "Kump.", "Pasukan", "Sekolah", "Pengurus", "Telefon", "Peserta", "Status", "Tindakan"].map((h) =>
-                  <th key={h} className="px-3 py-2 whitespace-nowrap">{h}</th>)}
-              </tr></thead>
-              <tbody>
-                {store.teams.map((t) => (
-                  <tr key={t.teamId} className="row-hover border-t border-white/5">
-                    <td className="px-3 py-2">{t.district}</td>
-                    <td className="px-3 py-2">{t.category}</td>
-                    <td className="px-3 py-2">{t.group}</td>
-                    <td className="px-3 py-2">{t.teamName}</td>
-                    <td className="px-3 py-2">{t.school || "-"}</td>
-                    <td className="px-3 py-2">{t.managerName || "-"}</td>
-                    <td className="px-3 py-2">{t.phone || "-"}</td>
-                    <td className="px-3 py-2">{t.players?.length || 0}</td>
-                    <td className="px-3 py-2">{t.registered ? <span className="text-gold">Disahkan</span> : <span className="text-white/40">Belum</span>}</td>
-                    <td className="px-3 py-2 flex gap-2">
-                      <button onClick={() => verify(t.teamId, !t.registered)} className="text-gold text-xs underline">
-                        {t.registered ? "Batal" : "Sahkan"}
-                      </button>
-                      <button onClick={() => deleteTeamData(t.teamId)} className="text-red-300"><Trash2 size={14} /></button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {CATEGORIES.map((cat) => {
+            const catTeams = store.teams
+              .filter((t) => t.category === cat && !t.excluded)
+              .sort((a, b) => a.group.localeCompare(b.group) || a.district.localeCompare(b.district));
+            return (
+              <div key={cat} className="mb-6">
+                <h3 className="font-display gold-text text-lg mb-3 flex items-center gap-2">
+                  {cat}
+                  <span className="text-white/40 text-xs font-normal">
+                    {catTeams.filter((t) => t.registered).length}/{catTeams.length} disahkan
+                  </span>
+                </h3>
+                <div className="overflow-x-auto glass p-1">
+                  <table className="w-full text-sm">
+                    <thead><tr className="text-gold/80 text-left">
+                      {["Kump.", "Daerah", "Pasukan", "Pengurus", "Telefon", "Peserta", "Status", "Tindakan"].map((h) =>
+                        <th key={h} className="px-3 py-2 whitespace-nowrap">{h}</th>)}
+                    </tr></thead>
+                    <tbody>
+                      {catTeams.map((t) => (
+                        <tr key={t.teamId} className="row-hover border-t border-white/5">
+                          <td className="px-3 py-2">
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gold/20 text-gold font-semibold border border-gold/40">{t.group}</span>
+                          </td>
+                          <td className="px-3 py-2 whitespace-nowrap">{t.district}</td>
+                          <td className="px-3 py-2 whitespace-nowrap">{t.teamName}</td>
+                          <td className="px-3 py-2 whitespace-nowrap">{t.managerName || "-"}</td>
+                          <td className="px-3 py-2 whitespace-nowrap">{t.phone || "-"}</td>
+                          <td className="px-3 py-2 text-center">{t.players?.length || 0}</td>
+                          <td className="px-3 py-2 whitespace-nowrap">
+                            {t.registered
+                              ? <span className="text-gold">● Disahkan</span>
+                              : <span className="text-white/40">○ Belum</span>}
+                          </td>
+                          <td className="px-3 py-2">
+                            <div className="flex gap-3 items-center">
+                              <button onClick={() => verify(t.teamId, !t.registered)} className="text-gold text-xs underline whitespace-nowrap">
+                                {t.registered ? "Batal" : "Sahkan"}
+                              </button>
+                              <button onClick={() => deleteTeamData(t.teamId)} className="text-red-300" title="Kosongkan data"><Trash2 size={14} /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {catTeams.length === 0 && (
+                        <tr><td colSpan={8} className="px-3 py-5 text-center text-white/40">Tiada pasukan.</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })}
         </>
       )}
 

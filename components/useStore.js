@@ -1,34 +1,50 @@
 "use client";
 import { useEffect, useState, useCallback, useRef } from "react";
-import { loadStore, saveStore } from "@/lib/store";
+import { loadStore, saveStore, defaultStore } from "@/lib/store";
 import { scheduleSync, fetchStore, syncEnabled } from "@/lib/sync";
 
-const POLL_MS = 5000; // semak Sheet setiap 5 saat supaya semua nampak update
+const POLL_MS = 3000; // semak Sheet setiap 3 saat
+
+// Pastikan store sentiasa sah supaya UI tak crash
+function safeStore(s) {
+  if (!s || typeof s !== "object") return defaultStore();
+  return {
+    teams: Array.isArray(s.teams) ? s.teams : [],
+    matches: Array.isArray(s.matches) ? s.matches : [],
+    knockout: s.knockout && typeof s.knockout === "object" ? s.knockout : {},
+  };
+}
 
 export function useStore() {
   const [store, setStore] = useState(null);
-  const localTouchedAt = useRef(0); // waktu user ini buat perubahan
+  const localTouchedAt = useRef(0);
 
-  const applyLocal = useCallback(() => setStore(loadStore()), []);
+  const applyLocal = useCallback(() => {
+    try { setStore(safeStore(loadStore())); }
+    catch { setStore(defaultStore()); }
+  }, []);
 
-  // Muat awal: cuba Sheet dulu, kalau gagal guna localStorage
+  // Muat awal
   useEffect(() => {
     let alive = true;
     (async () => {
-      if (syncEnabled()) {
-        const remote = await fetchStore();
-        if (alive && remote) {
-          saveStore(remote, { silent: true });
-          setStore(remote);
-          return;
+      try {
+        if (syncEnabled()) {
+          const remote = await fetchStore();
+          if (alive && remote) {
+            const safe = safeStore(remote);
+            saveStore(safe, { silent: true });
+            setStore(safe);
+            return;
+          }
         }
-      }
+      } catch { /* abaikan, jatuh ke localStorage */ }
       if (alive) applyLocal();
     })();
     return () => { alive = false; };
   }, [applyLocal]);
 
-  // Dengar perubahan tempatan (antara tab / komponen)
+  // Dengar perubahan tempatan
   useEffect(() => {
     const onUpdate = () => applyLocal();
     window.addEventListener("mlbb-update", onUpdate);
@@ -39,26 +55,31 @@ export function useStore() {
     };
   }, [applyLocal]);
 
-  // Poll Sheet supaya nampak perubahan orang lain
+  // Poll setiap 3 saat
   useEffect(() => {
     if (!syncEnabled()) return;
     const id = setInterval(async () => {
-      // Jangan timpa kalau user baru je buat perubahan (elak data hilang)
       if (Date.now() - localTouchedAt.current < POLL_MS) return;
-      const remote = await fetchStore();
-      if (remote) {
-        saveStore(remote, { silent: true });
-        setStore(remote);
-      }
+      try {
+        const remote = await fetchStore();
+        if (remote) {
+          const safe = safeStore(remote);
+          saveStore(safe, { silent: true });
+          setStore(safe);
+        }
+      } catch { /* abaikan ralat rangkaian, cuba lagi pusingan seterusnya */ }
     }, POLL_MS);
     return () => clearInterval(id);
   }, []);
 
   const commit = useCallback((next) => {
-    localTouchedAt.current = Date.now();
-    saveStore(next);
-    setStore({ ...next });
-    scheduleSync(next); // tulis ke Sheet
+    try {
+      const safe = safeStore(next);
+      localTouchedAt.current = Date.now();
+      saveStore(safe);
+      setStore(safe);
+      scheduleSync(safe);
+    } catch { /* abaikan */ }
   }, []);
 
   return { store, commit, refresh: applyLocal };
