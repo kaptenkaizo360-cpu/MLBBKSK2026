@@ -43,9 +43,9 @@ export default function Home() {
         </p>
 
         <div className="flex flex-wrap justify-start gap-3 mt-8">
-          <Link href="/login" className="btn btn-gold"><Shield size={18} /> Login Daerah</Link>
-          <Link href="/login" className="btn btn-emerald"><Gamepad2 size={18} /> Login Host</Link>
-          <Link href="/login" className="btn btn-emerald"><Trophy size={18} /> Login Admin</Link>
+          <Link href="/login?role=district" className="btn btn-gold"><Shield size={18} /> Login Daerah</Link>
+          <Link href="/login?role=host" className="btn btn-emerald"><Gamepad2 size={18} /> Login Host</Link>
+          <Link href="/login?role=admin" className="btn btn-emerald"><Trophy size={18} /> Login Admin</Link>
           <Link href="/standings" className="btn btn-ghost">Lihat Kedudukan</Link>
           <Link href="/results" className="btn btn-ghost">Lihat Keputusan</Link>
         </div>

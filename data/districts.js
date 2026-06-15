@@ -1,17 +1,17 @@
 // Senarai daerah + login. Kumpulan bergantung pada kategori.
 
 export const DISTRICTS = [
-  { name: "Johor Bahru", userId: "MLBBJOHORBAHRU", password: "U%Za3GiBv#3J" },
-  { name: "Pasir Gudang", userId: "MLBBPASIRGUDANG", password: "#buHz2yeYpP#" },
-  { name: "Kulai", userId: "MLBBKULAI", password: "X5WjHn3wU@ex" },
-  { name: "Kota Tinggi", userId: "MLBBKOTATINGGI", password: "65j%a&bzq5U*" },
-  { name: "Mersing", userId: "MLBBMERSING", password: "5Wzyxqn3X#iH" },
-  { name: "Kluang", userId: "MLBBKLUANG", password: "aVbx#6aj7vqx" },
-  { name: "Batu Pahat", userId: "MLBBBATUPAHAT", password: "AY%hcyK6hKa$" },
-  { name: "Muar", userId: "MLBBMUAR", password: "mYwjLganU2G*" },
-  { name: "Tangkak", userId: "MLBBTANGKAK", password: "t3MVk&mP2Y2c" },
-  { name: "Segamat", userId: "MLBBSEGAMAT", password: "j#t#F$bfN9Fd" },
-  { name: "Pontian", userId: "MLBBPONTIAN", password: "K2fR$m5&aYrp" },
+  { name: "Johor Bahru", userId: "MLBBJOHORBAHRU", password: "mlbbjohorbahru564" },
+  { name: "Pasir Gudang", userId: "MLBBPASIRGUDANG", password: "mlbbpasirgudang247" },
+  { name: "Kulai", userId: "MLBBKULAI", password: "mlbbkulai808" },
+  { name: "Kota Tinggi", userId: "MLBBKOTATINGGI", password: "mlbbkotatinggi625" },
+  { name: "Mersing", userId: "MLBBMERSING", password: "mlbbmersing814" },
+  { name: "Kluang", userId: "MLBBKLUANG", password: "mlbbkluang886" },
+  { name: "Batu Pahat", userId: "MLBBBATUPAHAT", password: "mlbbbatupahat979" },
+  { name: "Muar", userId: "MLBBMUAR", password: "mlbbmuar307" },
+  { name: "Tangkak", userId: "MLBBTANGKAK", password: "mlbbtangkak343" },
+  { name: "Segamat", userId: "MLBBSEGAMAT", password: "mlbbsegamat631" },
+  { name: "Pontian", userId: "MLBBPONTIAN", password: "mlbbpontian304" },
 ];
 
 export const HOST = { userId: "HOSTMLBBJOHOR", password: "avadakadabra" };

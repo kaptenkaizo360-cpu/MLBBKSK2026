@@ -16,7 +16,7 @@ Buka http://localhost:3000
 
 **Admin** — `ADMINMLBBJOHOR` / `avadakadabra360`
 **Host** — `HOSTMLBBJOHOR` / `avadakadabra`
-**Daerah** (contoh Kluang) — `MLBBKLUANG` / `aVbx#6aj7vqx`
+**Daerah** (contoh Kluang) — `MLBBKLUANG` / `mlbbkluang886`
 
 Senarai penuh kredensial daerah ada dalam Dashboard Admin → tab "Data & Tetapan",
 atau dalam fail `data/districts.js`.
