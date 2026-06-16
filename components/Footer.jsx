@@ -36,7 +36,7 @@ export default function Footer() {
         </div>
 
         <div className="text-center text-xs text-white/40 mt-6">
-          © 2026 Unit Pendidikan Khas · PPKI Daerah Kluang · Negeri Johor
+          © 2026 Sektor Pendidikan Khas Jabatan Pendidikan Negeri Johor
         </div>
       </div>
     </footer>
