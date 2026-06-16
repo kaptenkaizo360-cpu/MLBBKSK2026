@@ -119,7 +119,6 @@ export default function DistrictDashboard() {
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
-            <Field label="Nama Sekolah" value={active.school} disabled={!editing} onChange={(v) => setField({ school: v })} />
             <Field label="Nama Pasukan" value={active.teamName} disabled={!editing} onChange={(v) => setField({ teamName: v })} />
             <Field label="Nama Pengurus" value={active.managerName} disabled={!editing} onChange={(v) => setField({ managerName: v })} />
             <Field label="No. Telefon Pengurus" value={active.phone} disabled={!editing} onChange={(v) => setField({ phone: v })} />

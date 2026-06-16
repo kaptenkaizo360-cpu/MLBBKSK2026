@@ -17,7 +17,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center gap-2 text-sm text-white/70 mb-5 justify-center">
           <Shield size={16} className="text-gold" />
-          <span>Karnival Kokurikulum, Sukan & Kesenian Pendidikan Khas Negeri Johor 2026</span>
+          <span>E-Sports MLBB Pendidikan Khas Negeri Johor</span>
         </div>
 
         <div className="flex items-center gap-2 justify-center mb-4 text-gold/60 text-xs">
