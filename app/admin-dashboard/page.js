@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
+import SectionActions from "@/components/SectionActions";
+import { useUnsavedWarning } from "@/components/useUnsavedWarning";
 import { resetStore, semifinalPairs, setKnockout, leagueComplete, setTeamGroup, removeTeamFromLeague, deleteGroup, activeGroups } from "@/lib/store";
 import { syncNow, getSyncStatus, syncEnabled } from "@/lib/sync";
 import { DISTRICTS, CATEGORIES } from "@/data/districts";
@@ -11,6 +13,7 @@ export default function AdminDashboard() {
   const { ready } = useGuard(["admin"]);
   const { store, commit, refresh, saveToSheet, dirty } = useStore();
   const [tab, setTab] = useState("teams");
+  useUnsavedWarning(dirty);
   const [printDistrict, setPrintDistrict] = useState("ALL"); // ALL = semua daerah
   const [syncState, setSyncState] = useState("idle");
 
@@ -152,12 +155,15 @@ export default function AdminDashboard() {
               .sort((a, b) => a.group.localeCompare(b.group) || a.district.localeCompare(b.district));
             return (
               <div key={cat} className="mb-6">
-                <h3 className="font-display gold-text text-lg mb-3 flex items-center gap-2">
-                  {cat}
-                  <span className="text-white/40 text-xs font-normal">
-                    {catTeams.filter((t) => t.registered).length}/{catTeams.length} disahkan
-                  </span>
-                </h3>
+                <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+                  <h3 className="font-display gold-text text-lg flex items-center gap-2">
+                    {cat}
+                    <span className="text-white/40 text-xs font-normal">
+                      {catTeams.filter((t) => t.registered).length}/{catTeams.length} disahkan
+                    </span>
+                  </h3>
+                  <SectionActions dirty={dirty} onSave={saveNow} />
+                </div>
                 <div className="overflow-x-auto glass p-1">
                   <table className="w-full text-sm">
                     <thead><tr className="text-gold/80 text-left">
@@ -238,7 +244,10 @@ export default function AdminDashboard() {
                   const players = teamsInCat.flatMap((t) => (t.players || []).map((p) => ({ ...p, teamId: t.teamId })));
                   return (
                     <div key={cat} className="mb-4">
-                      <div className="text-gold/80 text-sm mb-2">{cat}</div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="text-gold/80 text-sm">{cat}</div>
+                        <SectionActions dirty={dirty} onSave={saveNow} />
+                      </div>
                       {players.length === 0 ? (
                         <p className="text-white/40 text-sm pl-1">Belum ada peserta.</p>
                       ) : (
@@ -282,7 +291,10 @@ export default function AdminDashboard() {
           </p>
           {CATEGORIES.map((cat) => (
             <div key={cat}>
-              <h3 className="font-display gold-text text-lg mb-3">{cat}</h3>
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+                <h3 className="font-display gold-text text-lg">{cat}</h3>
+                <SectionActions dirty={dirty} onSave={saveNow} />
+              </div>
               <div className="grid md:grid-cols-3 gap-4">
                 {["A", "B", "C"].map((grp) => {
                   const grpTeams = store.teams.filter((t) => t.category === cat && t.group === grp && !t.excluded);

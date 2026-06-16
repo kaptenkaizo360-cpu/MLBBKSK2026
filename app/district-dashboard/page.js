@@ -3,12 +3,14 @@ import { useState, useMemo, useEffect } from "react";
 import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
 import { Trash2, Save, UserPlus, CheckCircle2, RotateCcw, Lock, Pencil } from "lucide-react";
+import { useUnsavedWarning } from "@/components/useUnsavedWarning";
 
 const MAX_PLAYERS = 6;
 
 export default function DistrictDashboard() {
   const { session, ready } = useGuard(["district"]);
-  const { store, commit, saveToSheet } = useStore();
+  const { store, commit, saveToSheet, dirty } = useStore();
+  useUnsavedWarning(dirty || false);
   const [activeId, setActiveId] = useState(null);
   const [editing, setEditing] = useState(false); // sedang isi/edit borang
   const [draft, setDraft] = useState(null);       // salinan tempatan (apa yang ditaip)

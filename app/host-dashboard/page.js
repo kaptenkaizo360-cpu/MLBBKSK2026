@@ -6,10 +6,13 @@ import { StatusBadge } from "@/components/Tables";
 import { CATEGORIES } from "@/data/districts";
 import { Swords, RefreshCcw, Users, Trophy, Pencil, Save } from "lucide-react";
 import KnockoutEditor from "@/components/KnockoutEditor";
+import SectionActions from "@/components/SectionActions";
+import { useUnsavedWarning } from "@/components/useUnsavedWarning";
 
 export default function HostDashboard() {
   const { session, ready } = useGuard(["host"]);
   const { store, commit, saveToSheet, dirty } = useStore();
+  useUnsavedWarning(dirty);
   const [tab, setTab] = useState("results");
   const [cat, setCat] = useState("Sekolah Rendah");
   const [grp, setGrp] = useState("A");
@@ -144,9 +147,12 @@ export default function HostDashboard() {
 
       {tab === "knockout" && (
         <>
-          <p className="text-white/55 text-sm mb-4">
-            Isi keputusan separuh akhir, final, dan tempat ke-3/ke-4. Kedudukan akhir dikemaskini automatik.
-          </p>
+          <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+            <p className="text-white/55 text-sm">
+              Isi keputusan separuh akhir, final, dan tempat ke-3/ke-4. Kedudukan akhir dikemaskini automatik.
+            </p>
+            <SectionActions dirty={dirty} onSave={async () => { const ok = await saveToSheet(); window.alert(ok ? "Disimpan." : "Gagal / sambungan Sheet tiada."); }} />
+          </div>
           <KnockoutEditor store={store} commit={commit} allowFifthOverride={false} />
         </>
       )}
