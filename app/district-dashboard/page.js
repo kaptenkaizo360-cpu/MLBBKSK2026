@@ -122,7 +122,6 @@ export default function DistrictDashboard() {
             <Field label="Nama Pasukan" value={active.teamName} disabled={!editing} onChange={(v) => setField({ teamName: v })} />
             <Field label="Nama Pengurus" value={active.managerName} disabled={!editing} onChange={(v) => setField({ managerName: v })} />
             <Field label="No. Telefon Pengurus" value={active.phone} disabled={!editing} onChange={(v) => setField({ phone: v })} />
-            <Field label="Kumpulan" value={active.group} disabled />
           </div>
 
           <div className="flex items-center justify-between mt-8 mb-3">
