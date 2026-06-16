@@ -9,7 +9,7 @@ import KnockoutEditor from "@/components/KnockoutEditor";
 
 export default function HostDashboard() {
   const { session, ready } = useGuard(["host"]);
-  const { store, commit } = useStore();
+  const { store, commit, saveToSheet, dirty } = useStore();
   const [tab, setTab] = useState("results");
   const [cat, setCat] = useState("Sekolah Rendah");
   const [grp, setGrp] = useState("A");
@@ -35,7 +35,7 @@ export default function HostDashboard() {
     setEditingMatch(null);
     setDraftWinner(null);
   }
-  function saveMatch(m) {
+  async function saveMatch(m) {
     if (!draftWinner) { window.alert("Sila pilih pasukan yang menang dahulu."); return; }
     if (!window.confirm("Simpan keputusan perlawanan ini?")) return;
     const winner = draftWinner === "A" ? m.teamA : m.teamB;
@@ -43,14 +43,21 @@ export default function HostDashboard() {
     setMatch(m.matchId, { winner, loser, status: "completed", updatedBy: session.userId });
     setEditingMatch(null);
     setDraftWinner(null);
+    await saveToSheet();
   }
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
-      <h1 className="font-display gold-text text-2xl font-bold flex items-center gap-2">
-        <Swords /> Dashboard Host
-      </h1>
-      <p className="text-white/60 mb-6">Pilih pemenang — standing auto-update (Menang = 3 mata).</p>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <h1 className="font-display gold-text text-2xl font-bold flex items-center gap-2">
+          <Swords /> Dashboard Host
+        </h1>
+        <button onClick={async () => { const ok = await saveToSheet(); window.alert(ok ? "Data disimpan ke pangkalan data." : "Sambungan Sheet tiada / gagal."); }}
+          className={`btn text-sm ${dirty ? "btn-gold animate-pulse" : "btn-emerald"}`}>
+          <Save size={16} /> {dirty ? "Simpan*" : "Simpan ke Sheet"}
+        </button>
+      </div>
+      <p className="text-white/60 mb-6">Pilih pemenang & tekan Simpan. Standing dikemaskini automatik.</p>
 
       <div className="flex flex-wrap gap-2 mb-6">
         <button onClick={() => setTab("results")} className={`btn text-sm ${tab === "results" ? "btn-gold" : "btn-ghost"}`}>

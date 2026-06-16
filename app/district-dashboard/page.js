@@ -8,7 +8,7 @@ const MAX_PLAYERS = 6;
 
 export default function DistrictDashboard() {
   const { session, ready } = useGuard(["district"]);
-  const { store, commit } = useStore();
+  const { store, commit, saveToSheet } = useStore();
   const [activeId, setActiveId] = useState(null);
   const [editing, setEditing] = useState(false); // sedang isi/edit borang
   const [draft, setDraft] = useState(null);       // salinan tempatan (apa yang ditaip)
@@ -59,14 +59,17 @@ export default function DistrictDashboard() {
   }
 
   // SIMPAN — barulah tulis draf ke store + Sheet
-  function saveTeam() {
+  async function saveTeam() {
     const ok = window.confirm("Adakah anda pasti untuk menyimpan data ini?");
     if (!ok) return;
     const saved = { ...draft, registered: true };
     commit({ ...store, teams: store.teams.map((t) => t.teamId === saved.teamId ? saved : t) });
     setEditing(false);
     setDraft(null);
-    window.alert("Data telah disimpan.\n\nUntuk membetulkan maklumat, tekan butang 'Edit Maklumat'.");
+    const okSheet = await saveToSheet();
+    window.alert(okSheet
+      ? "Data telah disimpan dan dihantar ke pangkalan data."
+      : "Data disimpan dalam pelayar. (Sambungan Sheet tiada — perubahan belum dihantar ke pangkalan data.)");
   }
   function resetTeam() {
     const ok = window.confirm("PERINGATAN: Ini akan PADAM semua maklumat pasukan & peserta ini.\n\nTeruskan reset?");

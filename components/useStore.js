@@ -1,11 +1,10 @@
 "use client";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { loadStore, saveStore, defaultStore } from "@/lib/store";
-import { scheduleSync, fetchStore, syncEnabled } from "@/lib/sync";
+import { syncNow, fetchStore, syncEnabled } from "@/lib/sync";
 
-const POLL_MS = 3000; // semak Sheet setiap 3 saat
+const POLL_MS = 3000; // semak Sheet setiap 3 saat (BACA sahaja)
 
-// Pastikan store sentiasa sah supaya UI tak crash
 function safeStore(s) {
   if (!s || typeof s !== "object") return defaultStore();
   return {
@@ -17,7 +16,8 @@ function safeStore(s) {
 
 export function useStore() {
   const [store, setStore] = useState(null);
-  const localTouchedAt = useRef(0);
+  const [dirty, setDirty] = useState(false); // ada perubahan belum disimpan ke Sheet
+  const dirtyRef = useRef(false);
 
   const applyLocal = useCallback(() => {
     try { setStore(safeStore(loadStore())); }
@@ -38,7 +38,7 @@ export function useStore() {
             return;
           }
         }
-      } catch { /* abaikan, jatuh ke localStorage */ }
+      } catch { /* jatuh ke localStorage */ }
       if (alive) applyLocal();
     })();
     return () => { alive = false; };
@@ -55,11 +55,12 @@ export function useStore() {
     };
   }, [applyLocal]);
 
-  // Poll setiap 3 saat
+  // Poll setiap 3 saat — BACA dari Sheet supaya semua peranti nampak update.
+  // JANGAN timpa kalau ada perubahan tempatan belum disimpan, atau sedang menaip.
   useEffect(() => {
     if (!syncEnabled()) return;
     const id = setInterval(async () => {
-      if (Date.now() - localTouchedAt.current < POLL_MS) return;
+      if (dirtyRef.current) return; // ada perubahan belum Save — jangan timpa
       const el = typeof document !== "undefined" ? document.activeElement : null;
       if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT")) return;
       try {
@@ -69,20 +70,34 @@ export function useStore() {
           saveStore(safe, { silent: true });
           setStore(safe);
         }
-      } catch { /* abaikan ralat rangkaian, cuba lagi pusingan seterusnya */ }
+      } catch { /* abaikan ralat rangkaian */ }
     }, POLL_MS);
     return () => clearInterval(id);
   }, []);
 
+  // Perubahan disimpan ke PELAYAR sahaja — tandakan dirty (belum ke Sheet)
   const commit = useCallback((next) => {
     try {
       const safe = safeStore(next);
-      localTouchedAt.current = Date.now();
       saveStore(safe);
       setStore(safe);
-      scheduleSync(safe);
+      dirtyRef.current = true;
+      setDirty(true);
     } catch { /* abaikan */ }
   }, []);
 
-  return { store, commit, refresh: applyLocal };
+  // Tekan SAVE — tulis ke Sheet, kemudian tandakan tidak dirty
+  const saveToSheet = useCallback(async () => {
+    try {
+      const current = safeStore(loadStore());
+      await syncNow(current);
+      dirtyRef.current = false;
+      setDirty(false);
+      return true;
+    } catch {
+      return false;
+    }
+  }, []);
+
+  return { store, commit, refresh: applyLocal, saveToSheet, dirty };
 }

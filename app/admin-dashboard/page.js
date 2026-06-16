@@ -9,7 +9,7 @@ import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy, Clou
 
 export default function AdminDashboard() {
   const { ready } = useGuard(["admin"]);
-  const { store, commit, refresh } = useStore();
+  const { store, commit, refresh, saveToSheet, dirty } = useStore();
   const [tab, setTab] = useState("teams");
   const [printDistrict, setPrintDistrict] = useState("ALL"); // ALL = semua daerah
   const [syncState, setSyncState] = useState("idle");
@@ -65,9 +65,13 @@ export default function AdminDashboard() {
         ? { ...t, registered: false, school: "", managerName: "", phone: "", email: "", players: [] } : t),
     });
   }
-  function saveNow() {
-    if (syncEnabled()) { syncNow(store); window.alert("Data telah disimpan ke Google Sheet."); }
-    else window.alert("Data disimpan dalam pelayar ini. (Aktifkan Google Sheet untuk simpanan berkongsi.)");
+  async function saveNow() {
+    if (syncEnabled()) {
+      const ok = await saveToSheet();
+      window.alert(ok ? "Data telah disimpan ke Google Sheet." : "Gagal menyimpan ke Sheet. Cuba lagi.");
+    } else {
+      window.alert("Data disimpan dalam pelayar ini. (Aktifkan Google Sheet untuk simpanan berkongsi.)");
+    }
   }
   function printPlayers() {
     window.print();
@@ -102,7 +106,7 @@ export default function AdminDashboard() {
         <h1 className="font-display gold-text text-2xl font-bold">Dashboard Admin Negeri</h1>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <SyncBadge state={syncState} />
-          <button onClick={saveNow} className="btn btn-emerald text-sm"><Save size={16} /> Simpan</button>
+          <button onClick={saveNow} className={`btn text-sm ${dirty ? "btn-gold animate-pulse" : "btn-emerald"}`}><Save size={16} /> {dirty ? "Simpan*" : "Simpan"}</button>
           <button onClick={exportCSV} className="btn btn-gold text-sm"><Download size={16} /> Export CSV</button>
           <button onClick={() => { if (window.confirm("Reset SEMUA data pertandingan? Tindakan ini tidak boleh dibatalkan.")) { const s = resetStore(); refresh(); syncNow(s); } }} className="btn btn-danger text-sm">
             <RotateCcw size={16} /> Reset
