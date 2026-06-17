@@ -96,7 +96,7 @@ export default function DistrictDashboard() {
               {t.registered && <CheckCircle2 className="text-gold" size={18} />}
             </div>
             <div className="text-white/60 text-sm mt-1">
-              Kumpulan {t.group} · {t.registered ? `${t.teamName} · ${t.players?.length || 0} peserta` : "Belum berdaftar"}
+              {t.registered ? `${t.teamName} · ${t.players?.length || 0} peserta` : "Belum berdaftar"}
             </div>
           </button>
         ))}
