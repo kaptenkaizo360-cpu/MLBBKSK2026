@@ -1,18 +1,21 @@
 "use client";
 import { useEffect, useState, useCallback, useRef } from "react";
-import { loadStore, saveStore, defaultStore } from "@/lib/store";
+import { loadStore, saveStore, defaultStore, sanitizeStore } from "@/lib/store";
 import { syncNow, fetchStore, syncEnabled } from "@/lib/sync";
 
 const POLL_MS = 3000; // semak Sheet setiap 3 saat (BACA sahaja)
 
 function safeStore(s) {
   if (!s || typeof s !== "object") return defaultStore();
-  return {
+  const shaped = {
     teams: Array.isArray(s.teams) ? s.teams : [],
     matches: Array.isArray(s.matches) ? s.matches : [],
     knockout: s.knockout && typeof s.knockout === "object" ? s.knockout : {},
     published: s.published && typeof s.published === "object" ? s.published : {},
   };
+  // Bersihkan automatik — buang mana-mana pasukan/perlawanan yang bukan
+  // dari senarai daerah rasmi semasa (cth: daerah yang dah ditarik balik).
+  return sanitizeStore(shaped);
 }
 
 export function useStore() {
