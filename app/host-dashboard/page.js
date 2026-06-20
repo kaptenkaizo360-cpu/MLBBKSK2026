@@ -4,6 +4,7 @@ import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
 import { StatusBadge } from "@/components/Tables";
 import { CATEGORIES } from "@/data/districts";
+import { activeGroups } from "@/lib/store";
 import { Swords, RefreshCcw, Users, Trophy, Pencil, Save } from "lucide-react";
 import KnockoutEditor from "@/components/KnockoutEditor";
 import SectionActions from "@/components/SectionActions";
@@ -81,7 +82,7 @@ export default function HostDashboard() {
               {CATEGORIES.map((c) => <option key={c} className="bg-ink">{c}</option>)}
             </select>
             <select className="field max-w-[140px]" value={grp} onChange={(e) => setGrp(e.target.value)}>
-              {["A", "B", "C"].map((g) => <option key={g} className="bg-ink" value={g}>Kumpulan {g}</option>)}
+              {activeGroups(store, cat).map((g) => <option key={g} className="bg-ink" value={g}>Kumpulan {g}</option>)}
             </select>
           </div>
 

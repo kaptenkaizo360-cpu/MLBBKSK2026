@@ -18,17 +18,15 @@ export const ADMIN = { userId: "ADMINMLBBJOHOR", password: "avadakadabra360" };
 
 export const CATEGORIES = ["Sekolah Rendah", "Sekolah Menengah"];
 
-// Pembahagian kumpulan ikut kategori (Segamat tidak mengambil bahagian)
+// Pembahagian kumpulan ikut kategori — A & B sahaja (Segamat tidak mengambil bahagian)
 export const GROUPING = {
   "Sekolah Rendah": {
-    A: ["Johor Bahru", "Pasir Gudang", "Kulai", "Kota Tinggi"],
-    B: ["Mersing", "Pontian", "Kluang", "Batu Pahat"],
-    C: ["Muar", "Tangkak"],
+    A: ["Johor Bahru", "Pasir Gudang", "Kulai", "Kota Tinggi", "Muar"],
+    B: ["Mersing", "Pontian", "Kluang", "Batu Pahat", "Tangkak"],
   },
   "Sekolah Menengah": {
-    A: ["Kulai", "Kota Tinggi", "Mersing", "Kluang"],
-    B: ["Tangkak", "Batu Pahat", "Muar"],
-    C: ["Pontian", "Johor Bahru", "Pasir Gudang"],
+    A: ["Kulai", "Kota Tinggi", "Mersing", "Kluang", "Tangkak"],
+    B: ["Batu Pahat", "Muar", "Pontian", "Johor Bahru", "Pasir Gudang"],
   },
 };
 
@@ -38,6 +36,5 @@ export function groupOf(district, category) {
   if (!g) return "A";
   if (g.A.includes(district)) return "A";
   if (g.B.includes(district)) return "B";
-  if (g.C.includes(district)) return "C";
   return "A";
 }
