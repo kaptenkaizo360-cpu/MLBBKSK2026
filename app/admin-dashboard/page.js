@@ -300,11 +300,32 @@ export default function AdminDashboard() {
             const legacyTeams = store.teams.filter(
               (t) => t.category === cat && !t.excluded && t.group !== "A" && t.group !== "B"
             );
+            const published = isPublished(store, cat);
+            const regDone = registrationComplete(store, cat);
             return (
               <div key={cat}>
                 <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
-                  <h3 className="font-display gold-text text-lg">{cat}</h3>
-                  <SectionActions dirty={dirty} onSave={saveNow} />
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-display gold-text text-lg">{cat}</h3>
+                    {published && (
+                      <span className="text-gold text-xs">● Tersiar di paparan utama</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {published ? (
+                      <button onClick={() => togglePublish(cat, false)} className="btn btn-danger text-sm">
+                        <CalendarCheck size={15} /> Sorok Semula
+                      </button>
+                    ) : (
+                      <button onClick={() => togglePublish(cat, true)}
+                        disabled={!regDone}
+                        title={!regDone ? "Masih ada pasukan belum disahkan dalam kategori ini" : ""}
+                        className={`btn text-sm ${regDone ? "btn-gold" : "btn-ghost opacity-50 cursor-not-allowed"}`}>
+                        <CalendarCheck size={15} /> Sahkan & Terbitkan
+                      </button>
+                    )}
+                    <SectionActions dirty={dirty} onSave={saveNow} />
+                  </div>
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
                   {["A", "B"].map((grp) => {
