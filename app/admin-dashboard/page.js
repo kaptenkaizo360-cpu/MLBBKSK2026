@@ -4,10 +4,10 @@ import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
 import SectionActions from "@/components/SectionActions";
 import { useUnsavedWarning } from "@/components/useUnsavedWarning";
-import { resetStore, semifinalPairs, setKnockout, leagueComplete, setTeamGroup, removeTeamFromLeague, deleteGroup, activeGroups } from "@/lib/store";
+import { resetStore, semifinalPairs, setKnockout, leagueComplete, setTeamGroup, removeTeamFromLeague, deleteGroup, activeGroups, isPublished, setPublished, registrationComplete } from "@/lib/store";
 import { syncNow, getSyncStatus, syncEnabled } from "@/lib/sync";
 import { DISTRICTS, CATEGORIES } from "@/data/districts";
-import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy, Cloud, CloudOff, RefreshCw, ArrowLeftRight, Printer, Save } from "lucide-react";
+import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy, Cloud, CloudOff, RefreshCw, ArrowLeftRight, Printer, Save, CalendarCheck } from "lucide-react";
 
 export default function AdminDashboard() {
   const { ready } = useGuard(["admin"]);
@@ -87,9 +87,24 @@ export default function AdminDashboard() {
     { id: "teams", label: "Pasukan", icon: ShieldCheck },
     { id: "players", label: "Peserta & IGN", icon: Users },
     { id: "groups", label: "Kumpulan Liga", icon: ArrowLeftRight },
+    { id: "schedule", label: "Jadual Perlawanan", icon: CalendarCheck },
     { id: "knockout", label: "Kalah Mati", icon: Trophy },
     { id: "data", label: "Data & Tetapan", icon: Database },
   ];
+
+  function togglePublish(cat, value) {
+    if (value && !registrationComplete(store, cat)) {
+      window.alert("Tidak boleh terbitkan — masih ada pasukan yang belum disahkan dalam kategori ini.");
+      return;
+    }
+    const ok = window.confirm(
+      value
+        ? `Sahkan & terbitkan Jadual Perlawanan + Kedudukan untuk ${cat}? Ia akan dipaparkan di paparan utama.`
+        : `Sorok semula Jadual Perlawanan + Kedudukan untuk ${cat} dari paparan utama?`
+    );
+    if (!ok) return;
+    commit(setPublished(store, cat, value));
+  }
 
   function moveTeam(teamId, newGroup) {
     commit(setTeamGroup(store, teamId, newGroup));
@@ -341,6 +356,64 @@ export default function AdminDashboard() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {tab === "schedule" && (
+        <div className="space-y-8">
+          <p className="text-white/55 text-sm">
+            Jadual perlawanan dijana automatik dari susunan kumpulan. Sahkan & terbitkan untuk papar
+            di paparan utama bersama kedudukan liga. Hanya boleh diterbitkan selepas semua pasukan kategori itu disahkan.
+          </p>
+          {CATEGORIES.map((cat) => {
+            const groups = activeGroups(store, cat);
+            const published = isPublished(store, cat);
+            const regDone = registrationComplete(store, cat);
+            const total = store.teams.filter((t) => t.category === cat && !t.excluded).length;
+            const reg = store.teams.filter((t) => t.category === cat && !t.excluded && t.registered).length;
+            return (
+              <div key={cat} className="glass p-5">
+                <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+                  <div>
+                    <h3 className="font-display gold-text text-lg">{cat}</h3>
+                    <p className="text-white/40 text-xs mt-0.5">
+                      {reg}/{total} pasukan disahkan
+                      {published && <span className="text-gold ml-2">● Tersiar di paparan utama</span>}
+                    </p>
+                  </div>
+                  {published ? (
+                    <button onClick={() => togglePublish(cat, false)} className="btn btn-danger text-sm">
+                      <CalendarCheck size={15} /> Sorok Semula
+                    </button>
+                  ) : (
+                    <button onClick={() => togglePublish(cat, true)}
+                      disabled={!regDone}
+                      className={`btn text-sm ${regDone ? "btn-gold" : "btn-ghost opacity-50 cursor-not-allowed"}`}>
+                      <CalendarCheck size={15} /> Sahkan & Terbitkan
+                    </button>
+                  )}
+                </div>
+
+                {groups.map((g) => {
+                  const gMatches = store.matches.filter((m) => m.category === cat && m.group === g);
+                  return (
+                    <div key={g} className="mb-4">
+                      <div className="text-gold/70 text-xs mb-2">Kumpulan {g}</div>
+                      <div className="space-y-1.5">
+                        {gMatches.map((m) => (
+                          <div key={m.matchId} className="flex items-center justify-between bg-black/20 rounded-lg px-3 py-2 text-sm">
+                            <span className="text-white/40 text-xs">{m.matchId}</span>
+                            <span>{m.teamA} <span className="text-gold/60 mx-2">vs</span> {m.teamB}</span>
+                          </div>
+                        ))}
+                        {gMatches.length === 0 && <p className="text-white/40 text-sm">Tiada perlawanan.</p>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
         </div>
       )}
 

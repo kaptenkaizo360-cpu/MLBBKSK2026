@@ -85,7 +85,10 @@ export default function DistrictDashboard() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
       <h1 className="font-display gold-text text-2xl font-bold">Dashboard Daerah {session.district}</h1>
-      <p className="text-white/60 mb-8">Daftar pasukan sekolah rendah & menengah</p>
+      <p className="text-white/60 mb-2">Pendaftaran pasukan sekolah rendah & menengah</p>
+      <div className="inline-flex items-center gap-2 text-xs glass px-3 py-1.5 text-gold mb-8">
+        <Lock size={13} /> Pendaftaran telah ditutup. Sebarang pembetulan perlu dibuat oleh admin.
+      </div>
 
       <div className="grid md:grid-cols-2 gap-4 mb-8">
         {myTeams.map((t) => (
@@ -111,8 +114,9 @@ export default function DistrictDashboard() {
                 <span className="inline-flex items-center gap-1.5 text-xs glass px-3 py-1.5 text-gold">
                   <Lock size={14} /> Disimpan
                 </span>
-                <button onClick={startEdit} className="btn btn-gold text-sm">
-                  <Pencil size={14} /> Edit Maklumat
+                <button disabled title="Pendaftaran telah ditutup. Hubungi admin untuk sebarang pembetulan."
+                  className="btn text-sm bg-white/10 text-white/40 cursor-not-allowed border border-white/10">
+                  <Pencil size={14} /> Edit Maklumat (Ditutup)
                 </button>
               </div>
             )}

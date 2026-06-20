@@ -10,7 +10,6 @@ export const DISTRICTS = [
   { name: "Batu Pahat", userId: "MLBBBATUPAHAT", password: "mlbbbatupahat979" },
   { name: "Muar", userId: "MLBBMUAR", password: "mlbbmuar307" },
   { name: "Tangkak", userId: "MLBBTANGKAK", password: "mlbbtangkak343" },
-  { name: "Segamat", userId: "MLBBSEGAMAT", password: "mlbbsegamat631" },
   { name: "Pontian", userId: "MLBBPONTIAN", password: "mlbbpontian304" },
 ];
 
@@ -19,16 +18,16 @@ export const ADMIN = { userId: "ADMINMLBBJOHOR", password: "avadakadabra360" };
 
 export const CATEGORIES = ["Sekolah Rendah", "Sekolah Menengah"];
 
-// Pembahagian kumpulan ikut kategori
+// Pembahagian kumpulan ikut kategori (Segamat tidak mengambil bahagian)
 export const GROUPING = {
   "Sekolah Rendah": {
     A: ["Johor Bahru", "Pasir Gudang", "Kulai", "Kota Tinggi"],
     B: ["Mersing", "Pontian", "Kluang", "Batu Pahat"],
-    C: ["Muar", "Tangkak", "Segamat"],
+    C: ["Muar", "Tangkak"],
   },
   "Sekolah Menengah": {
     A: ["Kulai", "Kota Tinggi", "Mersing", "Kluang"],
-    B: ["Tangkak", "Segamat", "Batu Pahat", "Muar"],
+    B: ["Tangkak", "Batu Pahat", "Muar"],
     C: ["Pontian", "Johor Bahru", "Pasir Gudang"],
   },
 };

@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
-import { Trophy, Swords, Shield, Users, Gamepad2, Building2, GraduationCap, GitBranch, Crown, Lock } from "lucide-react";
+import { Trophy, Swords, Shield, Users, Gamepad2, Building2, GraduationCap, GitBranch, Crown, Lock, CalendarCheck } from "lucide-react";
 import { useStore } from "@/components/useStore";
-import { StatsCard, StandingTable } from "@/components/Tables";
-import { computeStandings, semifinalPairs, finalStandings, leagueComplete, registrationComplete, activeGroups } from "@/lib/store";
+import { StatsCard, StandingTable, StatusBadge } from "@/components/Tables";
+import { computeStandings, semifinalPairs, finalStandings, leagueComplete, isPublished, activeGroups } from "@/lib/store";
 import { CATEGORIES } from "@/data/districts";
 
 export default function Home() {
@@ -115,31 +115,60 @@ export default function Home() {
         </div>
       </section>
 
-      {/* STANDINGS — hanya selepas semua daerah daftar & disahkan admin */}
+      {/* JADUAL PERLAWANAN & STANDINGS — hanya selepas admin SAHKAN & TERBITKAN */}
       {store && CATEGORIES.map((cat) => {
-        const regDone = registrationComplete(store, cat);
+        const published = isPublished(store, cat);
         const done = leagueComplete(store, cat);
-        const total = store.teams.filter((t) => t.category === cat).length;
-        const reg = store.teams.filter((t) => t.category === cat && t.registered).length;
+        const total = store.teams.filter((t) => t.category === cat && !t.excluded).length;
+        const reg = store.teams.filter((t) => t.category === cat && !t.excluded && t.registered).length;
         return (
           <section key={cat} className="mb-12">
             <h3 className="font-display text-xl mb-4 flex items-center gap-2">
-              <Trophy size={18} className="text-gold" /> Kedudukan Liga {cat}
+              <Trophy size={18} className="text-gold" /> Liga {cat}
             </h3>
 
-            {!regDone ? (
+            {!published ? (
               <div className="glass p-6 flex items-center gap-3 text-white/70">
                 <Lock size={18} className="text-gold" />
                 <div>
-                  <div className="font-semibold">Liga belum bermula.</div>
+                  <div className="font-semibold">Jadual & Kedudukan belum diterbitkan.</div>
                   <div className="text-white/50 text-sm">
-                    Kedudukan akan dipaparkan setelah semua daerah selesai mendaftar dan disahkan oleh admin.
+                    Akan dipaparkan setelah admin mengesahkan dan menerbitkan jadual perlawanan.
                     ({reg}/{total} pasukan disahkan)
                   </div>
                 </div>
               </div>
             ) : (
               <>
+                {/* Jadual Perlawanan */}
+                <div className="mb-6">
+                  <h4 className="font-display text-gold/80 text-sm mb-3 flex items-center gap-2">
+                    <CalendarCheck size={15} /> Jadual Perlawanan
+                  </h4>
+                  <div className="grid lg:grid-cols-2 gap-4">
+                    {activeGroups(store, cat).map((g) => {
+                      const gMatches = store.matches.filter((m) => m.category === cat && m.group === g);
+                      return (
+                        <div key={g} className="glass p-4">
+                          <div className="text-gold/70 text-xs mb-2">Kumpulan {g}</div>
+                          <div className="space-y-1.5">
+                            {gMatches.map((m) => (
+                              <div key={m.matchId} className="flex items-center justify-between text-sm bg-black/20 rounded-lg px-3 py-2">
+                                <span>{m.teamA} <span className="text-gold/60 mx-1.5">vs</span> {m.teamB}</span>
+                                <StatusBadge status={m.status} />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Kedudukan Liga */}
+                <h4 className="font-display text-gold/80 text-sm mb-3 flex items-center gap-2">
+                  <Trophy size={15} /> Kedudukan Liga
+                </h4>
                 <div className="grid lg:grid-cols-2 gap-6">
                   {activeGroups(store, cat).map((g) => (
                     <div key={g}>

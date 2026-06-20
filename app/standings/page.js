@@ -2,7 +2,7 @@
 import { useStore } from "@/components/useStore";
 import BackToDashboard from "@/components/BackToDashboard";
 import { StandingTable } from "@/components/Tables";
-import { computeStandings, activeGroups, registrationComplete } from "@/lib/store";
+import { computeStandings, activeGroups, isPublished } from "@/lib/store";
 import { CATEGORIES } from "@/data/districts";
 import { Trophy, Lock } from "lucide-react";
 
@@ -17,19 +17,19 @@ export default function Standings() {
       </h1>
       <BackToDashboard />
       {CATEGORIES.map((cat) => {
-        const regDone = registrationComplete(store, cat);
+        const published = isPublished(store, cat);
         const total = store.teams.filter((t) => t.category === cat && !t.excluded).length;
         const reg = store.teams.filter((t) => t.category === cat && !t.excluded && t.registered).length;
         return (
           <div key={cat} className="mb-10">
             <h2 className="font-display text-xl mb-4">{cat}</h2>
-            {!regDone ? (
+            {!published ? (
               <div className="glass p-6 flex items-center gap-3 text-white/70">
                 <Lock size={18} className="text-gold" />
                 <div>
-                  <div className="font-semibold">Liga belum bermula.</div>
+                  <div className="font-semibold">Kedudukan belum diterbitkan.</div>
                   <div className="text-white/50 text-sm">
-                    Kedudukan akan dipaparkan setelah semua daerah selesai mendaftar dan disahkan oleh admin.
+                    Akan dipaparkan setelah admin mengesahkan dan menerbitkan jadual perlawanan.
                     ({reg}/{total} pasukan disahkan)
                   </div>
                 </div>

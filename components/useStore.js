@@ -11,6 +11,7 @@ function safeStore(s) {
     teams: Array.isArray(s.teams) ? s.teams : [],
     matches: Array.isArray(s.matches) ? s.matches : [],
     knockout: s.knockout && typeof s.knockout === "object" ? s.knockout : {},
+    published: s.published && typeof s.published === "object" ? s.published : {},
   };
 }
 
