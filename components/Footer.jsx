@@ -1,4 +1,5 @@
 import { Shield, Cpu } from "lucide-react";
+import VisitorCounter from "./VisitorCounter";
 
 // Logo teknologi (guna ikon SVG inline supaya tiada masalah hak cipta imej)
 const TECH = [
@@ -38,6 +39,7 @@ export default function Footer() {
         <div className="text-center text-xs text-white/40 mt-6">
           © 2026 Sektor Pendidikan Khas Jabatan Pendidikan Negeri Johor
         </div>
+        <VisitorCounter />
       </div>
     </footer>
   );
