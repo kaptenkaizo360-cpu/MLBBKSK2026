@@ -147,17 +147,33 @@ export default function Home() {
                   </h4>
                   <div className="grid lg:grid-cols-2 gap-4">
                     {activeGroups(store, cat).map((g) => {
-                      const gMatches = store.matches.filter((m) => m.category === cat && m.group === g);
+                      const gMatches = store.matches
+                        .filter((m) => m.category === cat && m.group === g)
+                        .sort((a, b) => (a.order || 0) - (b.order || 0));
                       return (
-                        <div key={g} className="glass p-4">
-                          <div className="text-gold/70 text-xs mb-2">Kumpulan {g}</div>
-                          <div className="space-y-1.5">
-                            {gMatches.map((m) => (
-                              <div key={m.matchId} className="flex items-center justify-between text-sm bg-black/20 rounded-lg px-3 py-2">
-                                <span>{m.teamA} <span className="text-gold/60 mx-1.5">vs</span> {m.teamB}</span>
-                                <StatusBadge status={m.status} />
-                              </div>
-                            ))}
+                        <div key={g} className="schedule-pro-group !p-0">
+                          <div className="schedule-pro-group-label px-3 pt-3">
+                            <span className="schedule-pro-badge">{g}</span> Kumpulan {g}
+                          </div>
+                          <div className="overflow-x-auto p-3 pt-2">
+                            <table className="w-full text-sm tournament-table-pro">
+                              <thead>
+                                <tr>
+                                  <th className="w-10">Bil</th>
+                                  <th>Perlawanan</th>
+                                  <th className="w-24">Status</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {gMatches.map((m, i) => (
+                                  <tr key={m.matchId}>
+                                    <td className="text-white/50">{i + 1}</td>
+                                    <td><span className="font-medium">{m.teamA}</span> <span className="text-gold/60 mx-1.5">vs</span> <span className="font-medium">{m.teamB}</span></td>
+                                    <td><StatusBadge status={m.status} /></td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
                           </div>
                         </div>
                       );

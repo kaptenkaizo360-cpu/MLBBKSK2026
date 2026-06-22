@@ -370,3 +370,82 @@ input::placeholder { color: rgba(255,255,255,.4); }
 @media (prefers-reduced-motion: reduce) {
   .gaming-grid, .scanlines, .particles, .energy-sweep, .gaming-emblem { animation: none; }
 }
+
+/* Jadual turnamen — gaya kemas macam jadual perlawanan rasmi */
+.tournament-table { border-collapse: collapse; }
+.tournament-table tbody tr { transition: background 0.15s; }
+.tournament-table tbody tr:hover { background: rgba(212,175,55,0.06); }
+.tournament-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* ===== Jadual Perlawanan — reka bentuk "level pro" ===== */
+.schedule-pro {
+  background: linear-gradient(160deg, rgba(19,49,110,0.35), rgba(5,13,36,0.55));
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 16px;
+  padding: 0;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+.schedule-pro-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 18px 20px;
+  background: linear-gradient(90deg, rgba(212,175,55,0.16), transparent);
+  border-bottom: 1px solid rgba(212,175,55,0.25);
+}
+.schedule-pro-emblem {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle, #D4AF37, #8a6d1a);
+  color: #07142e;
+  box-shadow: 0 0 14px rgba(242,201,76,0.5);
+  flex-shrink: 0;
+}
+.schedule-pro-group { padding: 16px 20px; }
+.schedule-pro-group-label {
+  display: flex; align-items: center; gap: 8px;
+  color: rgba(242,201,76,0.85);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.schedule-pro-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(212,175,55,0.18);
+  border: 1px solid rgba(212,175,55,0.5);
+  color: #F2C94C;
+  font-size: 12px; font-weight: 700;
+}
+
+.tournament-table-pro {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+.tournament-table-pro thead th {
+  background: rgba(212,175,55,0.08);
+  color: rgba(242,201,76,0.85);
+  text-align: left;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 9px 10px;
+  border-bottom: 1px solid rgba(212,175,55,0.25);
+}
+.tournament-table-pro tbody td {
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  vertical-align: middle;
+}
+.tournament-table-pro tbody tr:hover td {
+  background: rgba(212,175,55,0.05);
+}
+.tournament-table-pro tbody tr:last-child td {
+  border-bottom: none;
+}

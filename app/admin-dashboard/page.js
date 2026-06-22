@@ -4,10 +4,11 @@ import { useGuard } from "@/components/useGuard";
 import { useStore } from "@/components/useStore";
 import SectionActions from "@/components/SectionActions";
 import { useUnsavedWarning } from "@/components/useUnsavedWarning";
-import { resetStore, semifinalPairs, setKnockout, leagueComplete, setTeamGroup, removeTeamFromLeague, restoreTeam, activeGroups, isPublished, setPublished, registrationComplete } from "@/lib/store";
+import { resetStore, semifinalPairs, setKnockout, leagueComplete, setTeamGroup, removeTeamFromLeague, restoreTeam, activeGroups, isPublished, setPublished, registrationComplete, reorderMatch, setMatchTeams, addCustomMatch, deleteMatch } from "@/lib/store";
 import { syncNow, getSyncStatus, syncEnabled } from "@/lib/sync";
 import { DISTRICTS, CATEGORIES } from "@/data/districts";
-import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy, Cloud, CloudOff, RefreshCw, ArrowLeftRight, Printer, Save, CalendarCheck } from "lucide-react";
+import { StatusBadge } from "@/components/Tables";
+import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy, Cloud, CloudOff, RefreshCw, ArrowLeftRight, Printer, Save, CalendarCheck, ChevronUp, ChevronDown, Plus } from "lucide-react";
 
 export default function AdminDashboard() {
   const { ready } = useGuard(["admin"]);
@@ -314,14 +315,14 @@ export default function AdminDashboard() {
                   <div className="flex items-center gap-2 flex-wrap">
                     {published ? (
                       <button onClick={() => togglePublish(cat, false)} className="btn btn-danger text-sm">
-                        <CalendarCheck size={15} /> Sorok Semula
+                        <CalendarCheck size={15} /> Sorok dari Umum
                       </button>
                     ) : (
                       <button onClick={() => togglePublish(cat, true)}
                         disabled={!regDone}
                         title={!regDone ? "Masih ada pasukan belum disahkan dalam kategori ini" : ""}
                         className={`btn text-sm ${regDone ? "btn-gold" : "btn-ghost opacity-50 cursor-not-allowed"}`}>
-                        <CalendarCheck size={15} /> Sahkan & Terbitkan
+                        <CalendarCheck size={15} /> Terbitkan kepada Umum
                       </button>
                     )}
                     <SectionActions dirty={dirty} onSave={saveNow} />
@@ -397,8 +398,8 @@ export default function AdminDashboard() {
       {tab === "schedule" && (
         <div className="space-y-8">
           <p className="text-white/55 text-sm">
-            Jadual perlawanan dijana automatik dari susunan kumpulan. Sahkan & terbitkan untuk papar
-            di paparan utama bersama kedudukan liga. Hanya boleh diterbitkan selepas semua pasukan kategori itu disahkan.
+            Tetapkan sendiri siapa lawan siapa, dan susun siapa main dahulu. Sahkan & terbitkan untuk
+            papar di paparan utama bersama kedudukan liga.
           </p>
           {CATEGORIES.map((cat) => {
             const groups = activeGroups(store, cat);
@@ -407,42 +408,118 @@ export default function AdminDashboard() {
             const total = store.teams.filter((t) => t.category === cat && !t.excluded).length;
             const reg = store.teams.filter((t) => t.category === cat && !t.excluded && t.registered).length;
             return (
-              <div key={cat} className="glass p-5">
-                <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
-                  <div>
-                    <h3 className="font-display gold-text text-lg">{cat}</h3>
-                    <p className="text-white/40 text-xs mt-0.5">
-                      {reg}/{total} pasukan disahkan
-                      {published && <span className="text-gold ml-2">● Tersiar di paparan utama</span>}
-                    </p>
+              <div key={cat} className="schedule-pro">
+                {/* Banner tajuk kategori */}
+                <div className="schedule-pro-banner">
+                  <div className="flex items-center gap-3">
+                    <div className="schedule-pro-emblem">
+                      <Trophy size={18} />
+                    </div>
+                    <div>
+                      <h3 className="font-display font-bold text-lg text-white">{cat}</h3>
+                      <p className="text-gold/70 text-xs mt-0.5">
+                        {reg}/{total} pasukan disahkan
+                        {published && <span className="text-gold ml-2">● Tersiar di paparan utama</span>}
+                      </p>
+                    </div>
                   </div>
-                  {published ? (
-                    <button onClick={() => togglePublish(cat, false)} className="btn btn-danger text-sm">
-                      <CalendarCheck size={15} /> Sorok Semula
-                    </button>
-                  ) : (
-                    <button onClick={() => togglePublish(cat, true)}
-                      disabled={!regDone}
-                      className={`btn text-sm ${regDone ? "btn-gold" : "btn-ghost opacity-50 cursor-not-allowed"}`}>
-                      <CalendarCheck size={15} /> Sahkan & Terbitkan
-                    </button>
-                  )}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {published ? (
+                      <button onClick={() => togglePublish(cat, false)} className="btn btn-danger text-sm">
+                        <CalendarCheck size={15} /> Sorok dari Umum
+                      </button>
+                    ) : (
+                      <button onClick={() => togglePublish(cat, true)}
+                        disabled={!regDone}
+                        title={!regDone ? "Masih ada pasukan belum disahkan dalam kategori ini" : ""}
+                        className={`btn text-sm ${regDone ? "btn-gold" : "btn-ghost opacity-50 cursor-not-allowed"}`}>
+                        <CalendarCheck size={15} /> Terbitkan kepada Umum
+                      </button>
+                    )}
+                    <SectionActions dirty={dirty} onSave={saveNow} saveLabel="Simpan Jadual" />
+                  </div>
                 </div>
 
                 {groups.map((g) => {
-                  const gMatches = store.matches.filter((m) => m.category === cat && m.group === g);
+                  const gMatches = store.matches
+                    .filter((m) => m.category === cat && m.group === g)
+                    .sort((a, b) => (a.order || 0) - (b.order || 0));
+                  const groupTeams = store.teams.filter(
+                    (t) => t.category === cat && t.group === g && !t.excluded
+                  );
                   return (
-                    <div key={g} className="mb-4">
-                      <div className="text-gold/70 text-xs mb-2">Kumpulan {g}</div>
-                      <div className="space-y-1.5">
-                        {gMatches.map((m) => (
-                          <div key={m.matchId} className="flex items-center justify-between bg-black/20 rounded-lg px-3 py-2 text-sm">
-                            <span className="text-white/40 text-xs">{m.matchId}</span>
-                            <span>{m.teamA} <span className="text-gold/60 mx-2">vs</span> {m.teamB}</span>
-                          </div>
-                        ))}
-                        {gMatches.length === 0 && <p className="text-white/40 text-sm">Tiada perlawanan.</p>}
+                    <div key={g} className="schedule-pro-group">
+                      <div className="schedule-pro-group-label">
+                        <span className="schedule-pro-badge">{g}</span> Kumpulan {g}
                       </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm tournament-table-pro">
+                          <thead>
+                            <tr>
+                              <th className="w-10">Bil</th>
+                              <th>Pasukan A</th>
+                              <th className="w-10 text-center">vs</th>
+                              <th>Pasukan B</th>
+                              <th className="w-24">Status</th>
+                              <th className="w-28 text-center">Tindakan</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {gMatches.map((m, i) => (
+                              <tr key={m.matchId}>
+                                <td className="text-white/50">{i + 1}</td>
+                                <td>
+                                  <select
+                                    value={m.teamAId || ""}
+                                    onChange={(e) => commit(setMatchTeams(store, m.matchId, "A", e.target.value))}
+                                    className="field !py-1.5 text-sm font-medium">
+                                    {groupTeams.map((t) => (
+                                      <option key={t.teamId} value={t.teamId} className="bg-ink">{t.teamName}</option>
+                                    ))}
+                                  </select>
+                                </td>
+                                <td className="text-center text-gold/70 font-bold">vs</td>
+                                <td>
+                                  <select
+                                    value={m.teamBId || ""}
+                                    onChange={(e) => commit(setMatchTeams(store, m.matchId, "B", e.target.value))}
+                                    className="field !py-1.5 text-sm font-medium">
+                                    {groupTeams.map((t) => (
+                                      <option key={t.teamId} value={t.teamId} className="bg-ink">{t.teamName}</option>
+                                    ))}
+                                  </select>
+                                </td>
+                                <td><StatusBadge status={m.status} /></td>
+                                <td>
+                                  <div className="flex items-center justify-center gap-1">
+                                    <button onClick={() => commit(reorderMatch(store, m.matchId, "up"))}
+                                      disabled={i === 0} title="Naik"
+                                      className={`p-1 rounded ${i === 0 ? "text-white/20 cursor-not-allowed" : "text-gold hover:bg-gold/10"}`}>
+                                      <ChevronUp size={15} />
+                                    </button>
+                                    <button onClick={() => commit(reorderMatch(store, m.matchId, "down"))}
+                                      disabled={i === gMatches.length - 1} title="Turun"
+                                      className={`p-1 rounded ${i === gMatches.length - 1 ? "text-white/20 cursor-not-allowed" : "text-gold hover:bg-gold/10"}`}>
+                                      <ChevronDown size={15} />
+                                    </button>
+                                    <button onClick={() => { if (window.confirm("Padam slot perlawanan ini?")) commit(deleteMatch(store, m.matchId)); }}
+                                      title="Padam" className="p-1 rounded text-red-300 hover:bg-red-500/10">
+                                      <Trash2 size={14} />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                            {gMatches.length === 0 && (
+                              <tr><td colSpan={6} className="text-center text-white/40 py-4">Tiada perlawanan.</td></tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                      <button onClick={() => commit(addCustomMatch(store, cat, g))}
+                        className="btn btn-ghost text-xs !py-1.5 !px-3 mt-2">
+                        <Plus size={14} /> Tambah Perlawanan
+                      </button>
                     </div>
                   );
                 })}
