@@ -7,6 +7,7 @@ import { useUnsavedWarning } from "@/components/useUnsavedWarning";
 import { resetStore, semifinalPairs, setKnockout, leagueComplete, setTeamGroup, removeTeamFromLeague, restoreTeam, activeGroups, isPublished, setPublished, registrationComplete, reorderMatch, setMatchTeams, addCustomMatch, deleteMatch } from "@/lib/store";
 import { syncNow, getSyncStatus, syncEnabled } from "@/lib/sync";
 import { DISTRICTS, CATEGORIES } from "@/data/districts";
+import { fetchCredentialsList } from "@/lib/auth";
 import { StatusBadge } from "@/components/Tables";
 import { Download, Trash2, RotateCcw, Users, Database, ShieldCheck, Trophy, Cloud, CloudOff, RefreshCw, ArrowLeftRight, Printer, Save, CalendarCheck, ChevronUp, ChevronDown, Plus } from "lucide-react";
 
@@ -17,6 +18,18 @@ export default function AdminDashboard() {
   useUnsavedWarning(dirty);
   const [printDistrict, setPrintDistrict] = useState("ALL"); // ALL = semua daerah
   const [syncState, setSyncState] = useState("idle");
+  const [creds, setCreds] = useState(null);
+  const [credsLoading, setCredsLoading] = useState(false);
+
+  useEffect(() => {
+    if (tab === "data" && !creds && !credsLoading) {
+      setCredsLoading(true);
+      fetchCredentialsList().then((data) => {
+        setCreds(data);
+        setCredsLoading(false);
+      });
+    }
+  }, [tab, creds, credsLoading]);
 
   useEffect(() => {
     setSyncState(getSyncStatus());
@@ -578,21 +591,40 @@ export default function AdminDashboard() {
       {tab === "data" && (
         <div className="grid md:grid-cols-2 gap-6">
           <div className="glass p-6">
-            <h3 className="font-display gold-text mb-3">Kredensial Login Daerah</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead><tr className="text-gold/80 text-left"><th className="px-2 py-1">Daerah</th><th className="px-2 py-1">User ID</th><th className="px-2 py-1">Password</th></tr></thead>
-                <tbody>
-                  {DISTRICTS.map((d) => (
-                    <tr key={d.userId} className="border-t border-white/5">
-                      <td className="px-2 py-1">{d.name}</td>
-                      <td className="px-2 py-1 font-mono text-xs">{d.userId}</td>
-                      <td className="px-2 py-1 font-mono text-xs text-white/60">{d.password}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <h3 className="font-display gold-text mb-3">Kredensial Login</h3>
+            <p className="text-white/40 text-xs mb-3">
+              Disahkan terus dari server (bukan tersimpan dalam kod pelayar) — hanya admin yang log masuk sah boleh lihat ini.
+            </p>
+            {credsLoading ? (
+              <p className="text-white/50 text-sm">Memuatkan…</p>
+            ) : !creds ? (
+              <p className="text-red-300 text-sm">Gagal memuatkan kredensial. Cuba muat semula halaman.</p>
+            ) : (
+              <>
+                <div className="mb-4 text-sm">
+                  <div className="text-gold/70 text-xs mb-1">Admin</div>
+                  <div className="font-mono text-xs">{creds.admin.userId} <span className="text-white/40">/</span> {creds.admin.password}</div>
+                </div>
+                <div className="mb-4 text-sm">
+                  <div className="text-gold/70 text-xs mb-1">Host</div>
+                  <div className="font-mono text-xs">{creds.host.userId} <span className="text-white/40">/</span> {creds.host.password}</div>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead><tr className="text-gold/80 text-left"><th className="px-2 py-1">Daerah</th><th className="px-2 py-1">User ID</th><th className="px-2 py-1">Password</th></tr></thead>
+                    <tbody>
+                      {creds.districts.map((d) => (
+                        <tr key={d.userId} className="border-t border-white/5">
+                          <td className="px-2 py-1">{d.name}</td>
+                          <td className="px-2 py-1 font-mono text-xs">{d.userId}</td>
+                          <td className="px-2 py-1 font-mono text-xs text-white/60">{d.password}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
           </div>
           <div className="glass p-6">
             <h3 className="font-display gold-text mb-3 flex items-center gap-2">
@@ -697,8 +729,8 @@ function SyncBadge({ state }) {
   const s = map[state] || map.idle;
   const I = s.I;
   return (
-    <span className={`inline-flex items-center gap-1.5 text-xs glass px-3 py-1.5 ${s.c}`}>
-      <I size={14} className={(state === "syncing" || state === "loading") ? "animate-spin" : ""} /> {s.t}
+    <span title={s.t} className={`inline-flex items-center justify-center glass p-2 rounded-full ${s.c}`}>
+      <I size={16} className={(state === "syncing" || state === "loading") ? "animate-spin" : ""} />
     </span>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Menu, X, LogOut, Home, Trophy, Swords, GitBranch, Crown, LayoutDashboard } from "lucide-react";
+import { Menu, X, LogOut, Home, Trophy, Swords, GitBranch, Crown, LayoutDashboard, CalendarCheck } from "lucide-react";
 import { getSession, clearSession } from "@/lib/auth";
 
 export default function Navbar() {
@@ -16,6 +16,7 @@ export default function Navbar() {
 
   const links = [
     { href: "/", label: "Utama", icon: Home },
+    { href: "/jadual", label: "Jadual Perlawanan", icon: CalendarCheck },
     { href: "/standings", label: "Kedudukan", icon: Trophy },
     { href: "/results", label: "Keputusan", icon: Swords },
     { href: "/semifinal", label: "Separuh Akhir", icon: GitBranch },

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getSession } from "@/lib/auth";
+import { verifySession, clearSession } from "@/lib/auth";
 
 export function useGuard(roles) {
   const [session, setSession] = useState(null);
@@ -9,13 +9,21 @@ export function useGuard(roles) {
   const router = useRouter();
 
   useEffect(() => {
-    const s = getSession();
-    if (!s || (roles && !roles.includes(s.role))) {
-      router.push("/login");
-      return;
-    }
-    setSession(s);
-    setReady(true);
+    let alive = true;
+    (async () => {
+      // Sahkan TOKEN dengan server — localStorage sahaja tidak dipercayai,
+      // sebab ia boleh dipalsukan terus melalui DevTools pelayar.
+      const s = await verifySession();
+      if (!alive) return;
+      if (!s || (roles && !roles.includes(s.role))) {
+        clearSession();
+        router.push("/login");
+        return;
+      }
+      setSession(s);
+      setReady(true);
+    })();
+    return () => { alive = false; };
   }, [router, roles]);
 
   return { session, ready };

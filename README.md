@@ -55,7 +55,28 @@ git push -u origin main
 
 1. Daftar/masuk https://vercel.com
 2. "Add New… → Project" → import repo GitHub di atas.
-3. Vercel auto-detect Next.js. Tekan **Deploy**. Tiada env var diperlukan untuk versi demo.
+3. **PENTING — sebelum Deploy**, tambah Environment Variables:
+   - `AUTH_SECRET` — rentetan rawak panjang, untuk tandatangan token login.
+     `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+   - `GOOGLE_SHEETS_SECRET` — mesti **sama** dengan Script Property `SHARED_SECRET`
+     yang ditetapkan dalam Apps Script (lihat `apps-script/Code.gs` untuk arahan).
+   - `NEXT_PUBLIC_SHEET_SYNC_URL` — URL Web App Apps Script (jika guna Sheet sync).
+   - Tanpa `AUTH_SECRET`/`GOOGLE_SHEETS_SECRET` ini, sistem guna nilai fallback
+     dev yang **tidak selamat**.
+4. Tekan **Deploy**.
+
+⚠️ **Keselamatan penting:**
+- Sistem login guna token bertandatangan (HMAC) yang disahkan oleh API route
+  di server (`/api/login`, `/api/verify`) — password TIDAK lagi tersimpan
+  dalam kod pelayar.
+- Tulisan ke Google Sheet (`/api/sync`) WAJIB token log masuk sah + rahsia
+  kongsi yang sepadan dengan Apps Script — sesiapa yang jumpa URL Sheet
+  TIDAK boleh tulis ganti data tanpa kedua-dua ini.
+- **Kalau awak dah pernah deploy Apps Script SEBELUM kemaskini ini**, awak
+  WAJIB kemaskini `apps-script/Code.gs` (Extensions > Apps Script, salin
+  semula kod baru) DAN tetapkan Script Property `SHARED_SECRET`, kemudian
+  **Deploy > Manage deployments > Edit > Version: New version**. Tanpa
+  langkah ini, Apps Script lama masih terbuka tanpa sekatan.
 
 ## Struktur Folder
 

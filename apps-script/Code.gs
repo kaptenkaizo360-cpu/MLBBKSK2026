@@ -10,34 +10,64 @@
  * 1. Buka Google Sheet di atas.
  * 2. Menu Extensions > Apps Script.
  * 3. Padam kod sedia ada, tampal SEMUA kod ini. Tekan Save.
- * 4. Deploy > New deployment > jenis "Web app".
+ * 4. PENTING (keselamatan) — tetapkan rahsia kongsi:
+ *      a. Klik ikon gear "Project Settings" (sebelah kiri).
+ *      b. Tatal ke "Script Properties" > "Add script property".
+ *      c. Key: SHARED_SECRET
+ *         Value: rentetan rawak panjang (jana sendiri, jangan kongsi).
+ *      d. Simpan. Salin nilai ini — akan diperlukan dalam langkah 7.
+ * 5. Deploy > New deployment > jenis "Web app".
  *      - Execute as: Me
  *      - Who has access: Anyone
- * 5. Salin "Web app URL".
- * 6. Tampal URL itu dalam .env.local website:
- *      NEXT_PUBLIC_SHEET_SYNC_URL=https://script.google.com/macros/s/XXXX/exec
- *    (atau Environment Variable dalam Vercel).
+ * 6. Salin "Web app URL".
+ * 7. Tampal dalam Environment Variables Vercel:
+ *      NEXT_PUBLIC_SHEET_SYNC_URL = <Web app URL>
+ *      GOOGLE_SHEETS_SECRET       = <nilai SHARED_SECRET yang sama dari langkah 4c>
  *
  * NOTA: Setiap kali awak ubah kod ini, kena Deploy > Manage deployments >
  *       Edit > Version: New version, supaya perubahan naik.
+ *
+ * KESELAMATAN: Tanpa SHARED_SECRET ditetapkan, sesiapa yang tahu URL Web App
+ * ini boleh TULIS GANTI seluruh data tanpa perlu log masuk ke website.
+ * Pembacaan (doGet) sengaja dibiarkan terbuka supaya paparan awam (kedudukan,
+ * jadual, keputusan) berfungsi tanpa login — tapi PENULISAN (doPost) WAJIB
+ * disekat dengan rahsia ini.
  */
 
 var SHEET_ID = "1KFwkaFP1F956Hjv89UL-KiaFK_Bnme75jdbRsLGCpaA";
 var STORE_SHEET = "_DATA";   // simpan keseluruhan state sebagai JSON
 var LOCK_WAIT_MS = 10000;
 
-/** GET = website minta data terkini dari Sheet */
+/**
+ * RAHSIA KONGSI — pengesahan tulisan.
+ * Tetapkan nilai ini di Project Settings > Script Properties dengan key
+ * "SHARED_SECRET". JANGAN tulis nilai sebenar terus dalam kod ini.
+ * Website hantar rahsia ini (dari server Next.js, bukan dari pelayar
+ * pengguna) setiap kali nak TULIS data. Tanpa rahsia yang sepadan,
+ * permintaan POST akan DITOLAK.
+ */
+function getSharedSecret() {
+  return PropertiesService.getScriptProperties().getProperty("SHARED_SECRET") || "";
+}
+
+/** GET = website minta data terkini dari Sheet (baca — tiada sekatan) */
 function doGet() {
   var data = readStore();
   return json({ ok: true, store: data });
 }
 
-/** POST = website hantar state terkini untuk disimpan ke Sheet */
+/** POST = website hantar state terkini untuk disimpan ke Sheet — WAJIB rahsia sah */
 function doPost(e) {
   var lock = LockService.getScriptLock();
   try {
     lock.waitLock(LOCK_WAIT_MS);
     var body = JSON.parse(e.postData.contents);
+
+    var expected = getSharedSecret();
+    if (expected && body.secret !== expected) {
+      return json({ ok: false, error: "UNAUTHORIZED" });
+    }
+
     var store = body.store || body; // sokong dua format
     writeStore(store);
     writeReadableTabs(store);

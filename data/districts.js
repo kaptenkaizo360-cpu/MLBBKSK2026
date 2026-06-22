@@ -1,20 +1,19 @@
-// Senarai daerah + login. Kumpulan bergantung pada kategori.
+// Senarai daerah (untuk paparan/UI sahaja — TIADA password di sini).
+// Kredensial sebenar (userId+password) disimpan di data/credentials.js
+// yang hanya boleh diakses oleh API route di server.
 
 export const DISTRICTS = [
-  { name: "Johor Bahru", userId: "MLBBJOHORBAHRU", password: "mlbbjohorbahru564" },
-  { name: "Pasir Gudang", userId: "MLBBPASIRGUDANG", password: "mlbbpasirgudang247" },
-  { name: "Kulai", userId: "MLBBKULAI", password: "mlbbkulai808" },
-  { name: "Kota Tinggi", userId: "MLBBKOTATINGGI", password: "mlbbkotatinggi625" },
-  { name: "Mersing", userId: "MLBBMERSING", password: "mlbbmersing814" },
-  { name: "Kluang", userId: "MLBBKLUANG", password: "mlbbkluang886" },
-  { name: "Batu Pahat", userId: "MLBBBATUPAHAT", password: "mlbbbatupahat979" },
-  { name: "Muar", userId: "MLBBMUAR", password: "mlbbmuar307" },
-  { name: "Tangkak", userId: "MLBBTANGKAK", password: "mlbbtangkak343" },
-  { name: "Pontian", userId: "MLBBPONTIAN", password: "mlbbpontian304" },
+  { name: "Johor Bahru" },
+  { name: "Pasir Gudang" },
+  { name: "Kulai" },
+  { name: "Kota Tinggi" },
+  { name: "Mersing" },
+  { name: "Kluang" },
+  { name: "Batu Pahat" },
+  { name: "Muar" },
+  { name: "Tangkak" },
+  { name: "Pontian" },
 ];
-
-export const HOST = { userId: "HOSTMLBBJOHOR", password: "avadakadabra" };
-export const ADMIN = { userId: "ADMINMLBBJOHOR", password: "avadakadabra360" };
 
 export const CATEGORIES = ["Sekolah Rendah", "Sekolah Menengah"];
 

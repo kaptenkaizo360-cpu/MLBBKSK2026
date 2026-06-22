@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { loginAs, setSession } from "@/lib/auth";
-import { LogIn, ShieldCheck, KeyRound, Shield, Gamepad2, Trophy } from "lucide-react";
+import { loginAs } from "@/lib/auth";
+import { LogIn, ShieldCheck, KeyRound, Shield, Gamepad2, Trophy, Loader2 } from "lucide-react";
 
 const ROLES = [
   { id: "district", label: "Daerah", icon: Shield, hint: "cth: MLBBKLUANG", dest: "/district-dashboard" },
@@ -23,6 +23,7 @@ function LoginInner() {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const params = useSearchParams();
 
@@ -33,11 +34,12 @@ function LoginInner() {
 
   const active = ROLES.find((r) => r.id === role);
 
-  function submit() {
+  async function submit() {
     setError("");
-    const s = loginAs(role, userId, password);
+    setLoading(true);
+    const s = await loginAs(role, userId, password);
+    setLoading(false);
     if (!s) { setError(`ID atau kata laluan ${active.label} tidak sah.`); return; }
-    setSession(s);
     router.push(active.dest);
   }
 
@@ -86,8 +88,9 @@ function LoginInner() {
 
         {error && <p className="text-red-300 text-sm mt-3">{error}</p>}
 
-        <button onClick={submit} className="btn btn-gold w-full justify-center mt-6">
-          <LogIn size={18} /> Log Masuk sebagai {active.label}
+        <button onClick={submit} disabled={loading} className="btn btn-gold w-full justify-center mt-6 disabled:opacity-60">
+          {loading ? <Loader2 size={18} className="animate-spin" /> : <LogIn size={18} />}
+          {loading ? "Mengesahkan…" : `Log Masuk sebagai ${active.label}`}
         </button>
       </div>
     </div>
